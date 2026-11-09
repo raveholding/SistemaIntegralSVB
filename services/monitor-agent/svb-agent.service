@@ -1,0 +1,17 @@
+# /etc/systemd/system/svb-agent.service  ·  systemctl enable --now svb-agent
+[Unit]
+Description=SVB Monitor Agent (Vincular Business)
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/svb-agent.env
+ExecStart=/usr/bin/node /opt/svb-agent/agent.mjs
+Restart=always
+RestartSec=10
+User=nobody
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

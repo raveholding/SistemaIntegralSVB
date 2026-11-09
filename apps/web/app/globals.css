@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+
+html, body { @apply bg-ink-950 text-fg antialiased; }
+body {
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(124, 140, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56, 189, 248, 0.05), transparent 60%);
+  background-attachment: fixed;
+}
+::selection { background: rgba(124, 140, 255, 0.35); }
+* { scrollbar-width: thin; scrollbar-color: #2A3344 transparent; }
+.tabular-nums { font-variant-numeric: tabular-nums; }

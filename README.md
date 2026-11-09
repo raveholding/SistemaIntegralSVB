@@ -26,6 +26,19 @@ services/monitor-agent/   Agente Node sin dependencias para servidores de client
 docs/                     Arquitectura y modelo de datos
 ```
 
+## Versión HTML5 (un solo archivo, 100 % funcional)
+
+[`index.html`](index.html) contiene la plataforma completa en **un único archivo HTML5**: no necesita servidor, base de datos ni instalar nada.
+Se abre con doble clic, o se publica con **GitHub Pages** (Settings → Pages → rama `main`, carpeta `/`).
+
+- Ingreso por perfil (Dueño, Vendedora, Técnico, Administración y usuarios de cliente), con menús y acciones según permisos (RBAC editable).
+- Datos persistentes en el navegador: `localStorage`, más IndexedDB para los PDF de contratos. Incluye respaldo e importación en JSON.
+- Auditoría inmutable con SHA-256 encadenado, verificación de integridad y exportación a CSV.
+- Monitor con heartbeat simulado, reglas, watchdog y avisos reales por **Telegram** (en Ajustes, con el token del bot).
+- Caja: apertura, ventas con pagos mixtos, señas aplicables, anulaciones y notas de crédito, cierre con arqueo y comprobantes imprimibles.
+
+La versión Next.js + Supabase de `apps/web` es la evolución multi-usuario en la nube del mismo diseño.
+
 ## Inicio rápido
 
 ### Ver la interfaz en 1 minuto (modo demo, sin base de datos)

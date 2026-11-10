@@ -4,13 +4,16 @@
 function viewLogin() {
   const staff = S.users.filter((u) => u.active && STAFF_ROLES.includes(u.role));
   const clients = S.users.filter((u) => u.active && !STAFF_ROLES.includes(u.role));
-  const ucard = (u) => `<button class="ucard" data-act="login" data-id="${u.id}"><b>${esc(u.name)}</b><span>${ROLES[u.role]}${u.clientId ? " · " + esc(clientName(u.clientId)) : ""}</span></button>`;
+  const ucard = (u) => `<button class="ucard" data-act="login" data-id="${u.id}"><b>${esc(u.name)}</b><span>${ROLES[u.role]}${u.clientId ? " · " + esc(clientName(u.clientId)) : ""}${u.pinHash ? " · 🔒" : ""}</span></button>`;
   return `<div class="login"><div class="card"><div class="card-b" style="padding:32px">
     <div class="logo" style="padding:0;margin-bottom:24px"><div class="logo-mark" style="width:44px;height:44px">VB</div><div><b style="font-size:18px">Sistema Integral SVB</b><span>${esc(S.settings.company)} · plataforma de gestión</span></div></div>
+    ${S.demo ? `<div class="card" style="padding:14px 16px;margin-bottom:18px;border-color:var(--warn,#d9a400)"><b>Estás viendo datos de demostración.</b>
+      <p class="small muted" style="margin:6px 0 10px">Probá todo lo que quieras. Cuando quieras usarlo con tu empresa, empezá de cero: se borran los datos de ejemplo y quedás vos como Dueño.</p>
+      ${btn("Empezar con mis datos", "data-fresh", { tone: "primary", sm: true })}</div>` : ""}
     <p class="muted" style="margin-bottom:18px">Elegí un perfil para ingresar. Cada rol ve sólo los módulos y datos que su permiso habilita (RBAC).</p>
     <div class="eyebrow" style="margin-bottom:10px">Equipo interno</div><div class="users">${staff.map(ucard).join("")}</div>
-    <div class="eyebrow" style="margin:22px 0 10px">Portal de clientes</div><div class="users">${clients.map(ucard).join("")}</div>
-    <p class="xs subtle" style="margin-top:24px">Los datos se guardan en este navegador. Para producción, usar la versión con Supabase del repositorio (apps/web). Desarrollado por ${DEV.name} · WhatsApp ${DEV.wa} · ${DEV.email}</p>
+    ${clients.length ? `<div class="eyebrow" style="margin:22px 0 10px">Portal de clientes</div><div class="users">${clients.map(ucard).join("")}</div>` : ""}
+    <p class="xs subtle" style="margin-top:24px">Los datos se guardan en este navegador. Exportá un respaldo seguido desde Ajustes. Desarrollado por ${DEV.name} · WhatsApp ${DEV.wa} · ${DEV.email}</p>
   </div></div></div>`;
 }
 

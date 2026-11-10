@@ -283,6 +283,7 @@ function viewSettings() {
   card("Respaldo de datos", `<div class="card-b row wrap">
     ${btn("Exportar respaldo (JSON)", "data-export", { ic: "download" })}
     <label class="btn outline">${icon("upload")}Importar respaldo<input type="file" id="data-import" accept="application/json" hidden></label>
+    ${btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" })}
     ${btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
     <p class="xs subtle" style="flex-basis:100%">Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF.</p></div>`, { cls: "mt" });
 }
@@ -290,6 +291,7 @@ function userForm(u = {}) {
   return `<div class="fgrid">${field("Nombre *", `<input class="in" name="name" value="${esc(u.name)}">`)}${field("Email *", `<input class="in" name="email" type="email" value="${esc(u.email)}">`)}
     ${field("Rol", `<select class="in" name="role">${opts(Object.entries(ROLES), u.role ?? "employee")}</select>`)}
     ${field("Empresa (sólo roles cliente)", `<select class="in" name="clientId">${opts([["", "—"], ...S.clients.map((c) => [c.id, c.tradeName || c.legalName])], u.clientId)}</select>`)}
+    ${field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
     <label class="row small muted full"><input type="checkbox" name="active" ${u.active !== false ? "checked" : ""}> Usuario activo</label></div>
     ${u.id && STAFF_ROLES.includes(u.role) ? `<div class="eyebrow" style="margin:16px 0 8px">Excepciones de permisos (sobre el rol)</div>
       <div class="tw card"><table><tbody>${PERMS.map(([p, d]) => { const rp = S.rolePerms[u.role].includes(p); const ov = u.overrides?.[p];

@@ -37,6 +37,8 @@ Se abre con doble clic, o se publica con **GitHub Pages** (Settings → Pages �
 - Monitor con heartbeat simulado, reglas, watchdog y avisos reales por **Telegram** (en Ajustes, con el token del bot).
 - Caja: apertura, ventas con pagos mixtos, señas aplicables, anulaciones y notas de crédito, cierre con arqueo y comprobantes imprimibles.
 
+**Para empezar a usarlo con datos reales:** en la pantalla de ingreso (o en Ajustes → Respaldo de datos) tocar **Empezar con mis datos**. Se borra la demo, se conservan planes, roles, reglas de alertas y caja, y queda creado el usuario Dueño con PIN opcional. Cada usuario puede tener su PIN (Ajustes → Usuarios). Los datos viven en el navegador de cada equipo: exportar un respaldo JSON con frecuencia.
+
 El código fuente está en `html5/src/`. Se compila con `cd html5 && npm install && npm run build`, que genera `index.html` compatible con navegadores de celular desde iOS 11 y Android 7.
 
 La versión Next.js + Supabase de `apps/web` es la evolución multi-usuario en la nube del mismo diseño.

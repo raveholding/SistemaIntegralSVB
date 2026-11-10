@@ -4,7 +4,7 @@ function seedState() {
   const t = todayISO();
   const ago = (min) => new Date(Date.now() - min * 60000).toISOString();
   const s = {
-    version: 1, createdAt: nowISO(), session: { userId: null },
+    version: 1, demo: true, createdAt: nowISO(), session: { userId: null },
     settings: { company: "Vincular Business", cuit: "20-00000000-0", heartbeatSec: 3, telegram: { token: "", chatId: "", minSeverity: "warning", enabled: false }, simulate: true },
     rolePerms: structuredClone(DEFAULT_ROLE_PERMS),
     users: [
@@ -112,6 +112,20 @@ function seedState() {
   return s;
 }
 
+/* Estado vacío para empezar a usar el sistema con datos reales: conserva planes, roles,
+   reglas de alertas, caja y esquema de comisiones; borra clientes, ventas y demás datos demo. */
+function blankState({ company, cuit, ownerName, ownerEmail }) {
+  const s = seedState();
+  s.demo = false;
+  s.settings = { ...s.settings, company: company || "Mi empresa", cuit: cuit || "", simulate: false };
+  s.users = [{ id: "u1", name: ownerName, email: ownerEmail, role: "owner", clientId: null, overrides: {}, active: true }];
+  s.employees = [{ id: "e1", userId: "u1", name: ownerName, position: "Dueño", staffType: "partner", hireDate: todayISO(), salary: null, schemeId: null, active: true }];
+  for (const k of ["clients", "interactions", "subscriptions", "subChanges", "contracts", "contractVersions", "resources", "alerts", "sessions", "documents", "movements", "goals", "commissions", "pages", "pageVersions", "deployments", "leads", "tickets", "ticketMessages", "notifications", "audit"]) s[k] = [];
+  s.sites = [{ id: "site1", name: "Sitio corporativo", domain: "", provider: "GitHub Pages" }];
+  s.metrics = {}; s.samples = {}; s.seq = {};
+  return s;
+}
+
 function loadState() {
   const REQUIRED = ["users", "clients", "plans", "subscriptions", "contracts", "contractVersions", "resources", "alerts", "alertRules", "sessions", "documents", "movements", "employees", "goals", "commissions", "pages", "leads", "tickets", "ticketMessages", "notifications", "audit", "interactions", "subChanges", "registers", "schemes", "sites", "pageVersions", "deployments"];
   let raw = null;
@@ -119,7 +133,7 @@ function loadState() {
   if (raw) {
     try {
       const d = JSON.parse(raw);
-      if (d && d.version === 1 && REQUIRED.every((k) => Array.isArray(d[k])) && d.settings && d.rolePerms && d.session) { S = d; S.samples = S.samples || {}; S.metrics = S.metrics || {}; S.seq = S.seq || {}; return; }
+      if (d && d.version === 1 && REQUIRED.every((k) => Array.isArray(d[k])) && d.settings && d.rolePerms && d.session) { S = d; if (S.demo === undefined) S.demo = S.users.some((u) => u.email === "ventas@vincular.business"); S.samples = S.samples || {}; S.metrics = S.metrics || {}; S.seq = S.seq || {}; return; }
     } catch { /* JSON inválido */ }
     try { localStorage.setItem(APP_KEY + "_dañado_" + Date.now(), raw); } catch { }   // se conserva una copia
   }

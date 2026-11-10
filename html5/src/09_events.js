@@ -1,9 +1,22 @@
 <script>
 /* ════════════════════ ACCIONES (delegación de eventos) ════════════════════ */
 const val = (id) => $("#" + id)?.value ?? "";
+const pinHash = (userId, pin) => SHA.hex("svb-pin|" + userId + "|" + String(pin ?? ""));
+function doLogin(id) { S.session.userId = id; audit("LOGIN", "users", id, null, { role: currentUser().role }); saveNow(); UI.search = ""; UI.sale = null; location.hash = isPortalUser() ? "" : "#/dashboard"; processExpirations(); render(); }
 const A = {
   /* sesión */
-  login: (el) => { S.session.userId = el.dataset.id; audit("LOGIN", "users", el.dataset.id, null, { role: currentUser().role }); saveNow(); UI.search = ""; UI.sale = null; location.hash = isPortalUser() ? "" : "#/dashboard"; processExpirations(); render(); },
+  login: (el) => { const lu = db.get("users", el.dataset.id); if (lu?.pinHash) return openModal(`Ingresar como ${esc(lu.name)}`, field("PIN", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="current-password">`), { submitLabel: "Ingresar", submit: (f) => { if (pinHash(lu.id, formData(f).pin) !== lu.pinHash) throw new Error("PIN incorrecto"); setTimeout(() => doLogin(lu.id), 0); return null; } }); doLogin(el.dataset.id); },
+  "data-fresh": () => openModal("Empezar con mis datos", `<p class="small muted mb">Se borran <b>todos</b> los datos de este navegador (clientes, contratos, ventas, demo). Se conservan los planes, roles, reglas de alertas y la caja. Exportá un respaldo antes si cargaste algo.</p>
+    <div class="fgrid">${field("Nombre de tu empresa *", `<input class="in" name="company" value="Vincular Business">`)}${field("CUIT", `<input class="in" name="cuit" placeholder="20-00000000-0">`)}
+    ${field("Tu nombre *", `<input class="in" name="ownerName">`)}${field("Tu email *", `<input class="in" name="ownerEmail" type="email">`)}
+    ${field("PIN para tu usuario (recomendado)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`)}</div>`, { submitLabel: "Borrar demo y empezar", submit: (f) => {
+      const d = formData(f); d.company = (d.company || "").trim(); d.ownerName = (d.ownerName || "").trim(); d.ownerEmail = (d.ownerEmail || "").trim();
+      if (!d.company || !d.ownerName || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.ownerEmail)) throw new Error("Completá empresa, tu nombre y un email válido");
+      if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos");
+      try { Files.clear().catch(() => { }); } catch { } UI.sale = null; UI.search = "";
+      S = blankState(d); if (d.pin) S.users[0].pinHash = pinHash("u1", d.pin);
+      audit("SYSTEM_INIT", "system", null, null, { company: S.settings.company, fresh: true }); saveNow(); startMonitor(); location.hash = "";
+      return "Listo: sistema vacío para " + S.settings.company + ". Ingresá con tu usuario."; } }),
   logout: () => { audit("LOGOUT", "users", currentUser()?.id, null, null); S.session.userId = null; UI.notifOpen = false; saveNow(); render(); },
   menu: () => $("#side")?.classList.toggle("open"),
   notif: () => { UI.notifOpen = !UI.notifOpen; render(); },
@@ -122,9 +135,10 @@ const A = {
   "tg-save": () => run(() => { need("settings.manage"); Object.assign(S.settings.telegram, { token: val("tg-token").trim(), chatId: val("tg-chat").trim(), minSeverity: val("tg-min"), enabled: $("#tg-on").checked }); tgErrorShown = false; audit("UPDATE", "settings", "telegram", null, { chatId: S.settings.telegram.chatId, enabled: S.settings.telegram.enabled }); save(); }, "Telegram configurado"),
   "tg-test": async () => { A["tg-save"](); const tg = S.settings.telegram; if (!tg.token || !tg.chatId) return toast("Complete token y chat ID", "err"); const prev = tg.enabled; tg.enabled = true; tgErrorShown = false;
     const r = await sendTelegram("critical", "Mensaje de prueba: las alertas llegarán a este chat."); tg.enabled = prev; toast(r.ok ? "Mensaje enviado a Telegram ✓" : "No se pudo enviar: " + (r.error ?? "revise la configuración"), r.ok ? "ok" : "err"); },
-  "user-new": () => openModal("Nuevo usuario", userForm(), { submit: (f) => { const d = formData(f); saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active }); return "Usuario creado: ya puede ingresar"; } }),
+  "user-new": () => openModal("Nuevo usuario", userForm(), { submit: (f) => { const d = formData(f); if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos"); const nu = saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active }); if (d.pin) { db.update("users", nu.id, { pinHash: pinHash(nu.id, d.pin) }); } return "Usuario creado: ya puede ingresar"; } }),
   "user-edit": (el) => { const u = db.get("users", el.dataset.id); openModal("Editar usuario", userForm(u), { wide: true, submit: (f) => { const d = formData(f); const ov = {}; for (const [k, v] of Object.entries(d)) if (k.startsWith("ov:") && v !== "") ov[k.slice(3)] = v === "1";
-      if (u.id === currentUser().id && !d.active) throw new Error("No puede desactivar su propio usuario"); saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active, overrides: STAFF_ROLES.includes(d.role) ? ov : {} }, u.id); return "Usuario actualizado"; } }); },
+      if (u.id === currentUser().id && !d.active) throw new Error("No puede desactivar su propio usuario"); if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos"); saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active, overrides: STAFF_ROLES.includes(d.role) ? ov : {} }, u.id);
+      if (d.pinClear) db.update("users", u.id, { pinHash: null }); else if (d.pin) db.update("users", u.id, { pinHash: pinHash(u.id, d.pin) }); return "Usuario actualizado"; } }); },
   "data-export": () => { downloadText(`svb-respaldo-${todayISO()}.json`, JSON.stringify(S, null, 1), "application/json"); audit("EXPORT", "system", null, null, { backup: true }); save(); },
   "data-reset": async () => { if (!(await ask("Se borrarán todos los datos de este navegador y se cargará la demo.", { title: "Restablecer datos", ok: "Borrar y restablecer", danger: true }))) return; localStorage.removeItem(APP_KEY); try { await Files.clear(); } catch { } UI.sale = null; loadState(); startMonitor(); toast("Datos de demostración restablecidos"); render(); },
 };

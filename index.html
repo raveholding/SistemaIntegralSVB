@@ -553,6 +553,7 @@ function seedState() {
   const ago = (min) => new Date(Date.now() - min * 6e4).toISOString();
   const s = {
     version: 1,
+    demo: true,
     createdAt: nowISO(),
     session: { userId: null },
     settings: { company: "Vincular Business", cuit: "20-00000000-0", heartbeatSec: 3, telegram: { token: "", chatId: "", minSeverity: "warning", enabled: false }, simulate: true },
@@ -693,6 +694,19 @@ function seedState() {
   }
   return s;
 }
+function blankState({ company, cuit, ownerName, ownerEmail }) {
+  const s = seedState();
+  s.demo = false;
+  s.settings = __spreadProps(__spreadValues({}, s.settings), { company: company || "Mi empresa", cuit: cuit || "", simulate: false });
+  s.users = [{ id: "u1", name: ownerName, email: ownerEmail, role: "owner", clientId: null, overrides: {}, active: true }];
+  s.employees = [{ id: "e1", userId: "u1", name: ownerName, position: "Dueño", staffType: "partner", hireDate: todayISO(), salary: null, schemeId: null, active: true }];
+  for (const k of ["clients", "interactions", "subscriptions", "subChanges", "contracts", "contractVersions", "resources", "alerts", "sessions", "documents", "movements", "goals", "commissions", "pages", "pageVersions", "deployments", "leads", "tickets", "ticketMessages", "notifications", "audit"]) s[k] = [];
+  s.sites = [{ id: "site1", name: "Sitio corporativo", domain: "", provider: "GitHub Pages" }];
+  s.metrics = {};
+  s.samples = {};
+  s.seq = {};
+  return s;
+}
 function loadState() {
   const REQUIRED = ["users", "clients", "plans", "subscriptions", "contracts", "contractVersions", "resources", "alerts", "alertRules", "sessions", "documents", "movements", "employees", "goals", "commissions", "pages", "leads", "tickets", "ticketMessages", "notifications", "audit", "interactions", "subChanges", "registers", "schemes", "sites", "pageVersions", "deployments"];
   let raw = null;
@@ -705,6 +719,7 @@ function loadState() {
       const d = JSON.parse(raw);
       if (d && d.version === 1 && REQUIRED.every((k) => Array.isArray(d[k])) && d.settings && d.rolePerms && d.session) {
         S = d;
+        if (S.demo === void 0) S.demo = S.users.some((u) => u.email === "ventas@vincular.business");
         S.samples = S.samples || {};
         S.metrics = S.metrics || {};
         S.seq = S.seq || {};
@@ -1688,13 +1703,16 @@ function drawChart(canvas, data, { key, warn, crit, unit, max, color = "#7C8CFF"
 function viewLogin() {
   const staff = S.users.filter((u) => u.active && STAFF_ROLES.includes(u.role));
   const clients = S.users.filter((u) => u.active && !STAFF_ROLES.includes(u.role));
-  const ucard = (u) => `<button class="ucard" data-act="login" data-id="${u.id}"><b>${esc(u.name)}</b><span>${ROLES[u.role]}${u.clientId ? " · " + esc(clientName(u.clientId)) : ""}</span></button>`;
+  const ucard = (u) => `<button class="ucard" data-act="login" data-id="${u.id}"><b>${esc(u.name)}</b><span>${ROLES[u.role]}${u.clientId ? " · " + esc(clientName(u.clientId)) : ""}${u.pinHash ? " · 🔒" : ""}</span></button>`;
   return `<div class="login"><div class="card"><div class="card-b" style="padding:32px">
     <div class="logo" style="padding:0;margin-bottom:24px"><div class="logo-mark" style="width:44px;height:44px">VB</div><div><b style="font-size:18px">Sistema Integral SVB</b><span>${esc(S.settings.company)} · plataforma de gestión</span></div></div>
+    ${S.demo ? `<div class="card" style="padding:14px 16px;margin-bottom:18px;border-color:var(--warn,#d9a400)"><b>Estás viendo datos de demostración.</b>
+      <p class="small muted" style="margin:6px 0 10px">Probá todo lo que quieras. Cuando quieras usarlo con tu empresa, empezá de cero: se borran los datos de ejemplo y quedás vos como Dueño.</p>
+      ${btn("Empezar con mis datos", "data-fresh", { tone: "primary", sm: true })}</div>` : ""}
     <p class="muted" style="margin-bottom:18px">Elegí un perfil para ingresar. Cada rol ve sólo los módulos y datos que su permiso habilita (RBAC).</p>
     <div class="eyebrow" style="margin-bottom:10px">Equipo interno</div><div class="users">${staff.map(ucard).join("")}</div>
-    <div class="eyebrow" style="margin:22px 0 10px">Portal de clientes</div><div class="users">${clients.map(ucard).join("")}</div>
-    <p class="xs subtle" style="margin-top:24px">Los datos se guardan en este navegador. Para producción, usar la versión con Supabase del repositorio (apps/web). Desarrollado por ${DEV.name} · WhatsApp ${DEV.wa} · ${DEV.email}</p>
+    ${clients.length ? `<div class="eyebrow" style="margin:22px 0 10px">Portal de clientes</div><div class="users">${clients.map(ucard).join("")}</div>` : ""}
+    <p class="xs subtle" style="margin-top:24px">Los datos se guardan en este navegador. Exportá un respaldo seguido desde Ajustes. Desarrollado por ${DEV.name} · WhatsApp ${DEV.wa} · ${DEV.email}</p>
   </div></div></div>`;
 }
 function viewDashboard() {
@@ -2238,6 +2256,7 @@ function viewSettings() {
   ) + card("Respaldo de datos", `<div class="card-b row wrap">
     ${btn("Exportar respaldo (JSON)", "data-export", { ic: "download" })}
     <label class="btn outline">${icon("upload")}Importar respaldo<input type="file" id="data-import" accept="application/json" hidden></label>
+    ${btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" })}
     ${btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
     <p class="xs subtle" style="flex-basis:100%">Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF.</p></div>`, { cls: "mt" });
 }
@@ -2246,6 +2265,7 @@ function userForm(u = {}) {
   return `<div class="fgrid">${field("Nombre *", `<input class="in" name="name" value="${esc(u.name)}">`)}${field("Email *", `<input class="in" name="email" type="email" value="${esc(u.email)}">`)}
     ${field("Rol", `<select class="in" name="role">${opts(Object.entries(ROLES), (_a = u.role) != null ? _a : "employee")}</select>`)}
     ${field("Empresa (sólo roles cliente)", `<select class="in" name="clientId">${opts([["", "—"], ...S.clients.map((c) => [c.id, c.tradeName || c.legalName])], u.clientId)}</select>`)}
+    ${field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
     <label class="row small muted full"><input type="checkbox" name="active" ${u.active !== false ? "checked" : ""}> Usuario activo</label></div>
     ${u.id && STAFF_ROLES.includes(u.role) ? `<div class="eyebrow" style="margin:16px 0 8px">Excepciones de permisos (sobre el rol)</div>
       <div class="tw card"><table><tbody>${PERMS.map(([p, d]) => {
@@ -2339,18 +2359,53 @@ const val = (id) => {
   var _a, _b;
   return (_b = (_a = $("#" + id)) == null ? void 0 : _a.value) != null ? _b : "";
 };
+const pinHash = (userId, pin) => SHA.hex("svb-pin|" + userId + "|" + String(pin != null ? pin : ""));
+function doLogin(id) {
+  S.session.userId = id;
+  audit("LOGIN", "users", id, null, { role: currentUser().role });
+  saveNow();
+  UI.search = "";
+  UI.sale = null;
+  location.hash = isPortalUser() ? "" : "#/dashboard";
+  processExpirations();
+  render();
+}
 const A = {
   /* sesión */
   login: (el) => {
-    S.session.userId = el.dataset.id;
-    audit("LOGIN", "users", el.dataset.id, null, { role: currentUser().role });
-    saveNow();
-    UI.search = "";
-    UI.sale = null;
-    location.hash = isPortalUser() ? "" : "#/dashboard";
-    processExpirations();
-    render();
+    const lu = db.get("users", el.dataset.id);
+    if (lu == null ? void 0 : lu.pinHash) return openModal(`Ingresar como ${esc(lu.name)}`, field("PIN", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="current-password">`), { submitLabel: "Ingresar", submit: (f) => {
+      if (pinHash(lu.id, formData(f).pin) !== lu.pinHash) throw new Error("PIN incorrecto");
+      setTimeout(() => doLogin(lu.id), 0);
+      return null;
+    } });
+    doLogin(el.dataset.id);
   },
+  "data-fresh": () => openModal("Empezar con mis datos", `<p class="small muted mb">Se borran <b>todos</b> los datos de este navegador (clientes, contratos, ventas, demo). Se conservan los planes, roles, reglas de alertas y la caja. Exportá un respaldo antes si cargaste algo.</p>
+    <div class="fgrid">${field("Nombre de tu empresa *", `<input class="in" name="company" value="Vincular Business">`)}${field("CUIT", `<input class="in" name="cuit" placeholder="20-00000000-0">`)}
+    ${field("Tu nombre *", `<input class="in" name="ownerName">`)}${field("Tu email *", `<input class="in" name="ownerEmail" type="email">`)}
+    ${field("PIN para tu usuario (recomendado)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`)}</div>`, { submitLabel: "Borrar demo y empezar", submit: (f) => {
+    const d = formData(f);
+    d.company = (d.company || "").trim();
+    d.ownerName = (d.ownerName || "").trim();
+    d.ownerEmail = (d.ownerEmail || "").trim();
+    if (!d.company || !d.ownerName || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.ownerEmail)) throw new Error("Completá empresa, tu nombre y un email válido");
+    if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos");
+    try {
+      Files.clear().catch(() => {
+      });
+    } catch (e) {
+    }
+    UI.sale = null;
+    UI.search = "";
+    S = blankState(d);
+    if (d.pin) S.users[0].pinHash = pinHash("u1", d.pin);
+    audit("SYSTEM_INIT", "system", null, null, { company: S.settings.company, fresh: true });
+    saveNow();
+    startMonitor();
+    location.hash = "";
+    return "Listo: sistema vacío para " + S.settings.company + ". Ingresá con tu usuario.";
+  } }),
   logout: () => {
     var _a;
     audit("LOGOUT", "users", (_a = currentUser()) == null ? void 0 : _a.id, null, null);
@@ -2803,7 +2858,11 @@ Diferencia ${fmt.money(r2(cnt - exp), true)}`, { title: "Cerrar caja", ok: "Cerr
   },
   "user-new": () => openModal("Nuevo usuario", userForm(), { submit: (f) => {
     const d = formData(f);
-    saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active });
+    if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos");
+    const nu = saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active });
+    if (d.pin) {
+      db.update("users", nu.id, { pinHash: pinHash(nu.id, d.pin) });
+    }
     return "Usuario creado: ya puede ingresar";
   } }),
   "user-edit": (el) => {
@@ -2813,7 +2872,10 @@ Diferencia ${fmt.money(r2(cnt - exp), true)}`, { title: "Cerrar caja", ok: "Cerr
       const ov = {};
       for (const [k, v] of Object.entries(d)) if (k.startsWith("ov:") && v !== "") ov[k.slice(3)] = v === "1";
       if (u.id === currentUser().id && !d.active) throw new Error("No puede desactivar su propio usuario");
+      if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos");
       saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active, overrides: STAFF_ROLES.includes(d.role) ? ov : {} }, u.id);
+      if (d.pinClear) db.update("users", u.id, { pinHash: null });
+      else if (d.pin) db.update("users", u.id, { pinHash: pinHash(u.id, d.pin) });
       return "Usuario actualizado";
     } });
   },

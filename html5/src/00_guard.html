@@ -1,0 +1,29 @@
+<script>
+/* Compatibilidad y pantalla de error (ES5: corre incluso en navegadores viejos) */
+(function () {
+  if (typeof window.structuredClone !== "function") {
+    window.structuredClone = function (v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); };
+  }
+  function show(msg) {
+    if (window.__svbErrorShown) return; window.__svbErrorShown = true;
+    var box = document.createElement("div");
+    box.setAttribute("style", "position:fixed;inset:0;z-index:99;background:#07090D;color:#E6EAF2;font:15px system-ui,sans-serif;padding:28px;overflow:auto");
+    box.innerHTML = '<div style="max-width:560px;margin:40px auto"><h2 style="margin:0 0 12px">El sistema no pudo iniciar</h2>' +
+      '<p style="color:#9AA4B6;line-height:1.5">Probá estas opciones en orden. Si sigue igual, mandá una captura de esta pantalla a Vincular Business · WhatsApp (387) 4484132.</p>' +
+      '<button id="svb-reset" style="margin:12px 8px 12px 0;padding:12px 18px;border:0;border-radius:12px;background:#22E39B;color:#07090D;font-weight:700">Restablecer datos y reintentar</button>' +
+      '<button onclick="location.reload()" style="padding:12px 18px;border:0;border-radius:12px;background:#1E2533;color:#E6EAF2">Recargar</button>' +
+      '<p style="color:#6B768A;font-size:12px;margin-top:18px">Detalle técnico: ' + String(msg).replace(/[<>&]/g, "") + '<br>Navegador: ' + navigator.userAgent.replace(/[<>&]/g, "") + '</p></div>';
+    (document.body || document.documentElement).appendChild(box);
+    document.getElementById("svb-reset").onclick = function () {
+      try { localStorage.removeItem("svb_integral_v1"); } catch (e) {}
+      try { indexedDB.deleteDatabase("svb_files"); } catch (e) {}
+      location.reload();
+    };
+  }
+  window.__svbShowError = show;
+  window.addEventListener("error", function (e) { show((e.message || "Error") + (e.lineno ? " (línea " + e.lineno + ")" : "")); });
+  window.addEventListener("unhandledrejection", function (e) { if (!window.__svbStarted) show(e.reason && e.reason.message || e.reason); });
+  // si a los 4 s no arrancó la app, avisar en vez de dejar la pantalla negra
+  setTimeout(function () { if (!window.__svbStarted) show("La aplicación no terminó de cargar (posible navegador desactualizado o bloqueo de scripts)."); }, 4000);
+})();
+</script>

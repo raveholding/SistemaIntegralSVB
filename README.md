@@ -37,6 +37,8 @@ Se abre con doble clic, o se publica con **GitHub Pages** (Settings → Pages �
 - Monitor con heartbeat simulado, reglas, watchdog y avisos reales por **Telegram** (en Ajustes, con el token del bot).
 - Caja: apertura, ventas con pagos mixtos, señas aplicables, anulaciones y notas de crédito, cierre con arqueo y comprobantes imprimibles.
 
+El código fuente está en `html5/src/`. Se compila con `cd html5 && npm install && npm run build`, que genera `index.html` compatible con navegadores de celular desde iOS 11 y Android 7.
+
 La versión Next.js + Supabase de `apps/web` es la evolución multi-usuario en la nube del mismo diseño.
 
 ## Inicio rápido

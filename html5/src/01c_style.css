@@ -90,3 +90,5 @@ html[data-theme=light] .logo-mark{color:#fff}
 /* botón flotante de ayuda en el acceso */
 .fab{position:fixed;right:18px;bottom:18px;z-index:30;display:flex;align-items:center;gap:8px;height:48px;padding:0 18px;border-radius:99px;border:0;background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;font-weight:700;box-shadow:0 14px 30px -10px rgba(34,197,94,.7);text-decoration:none}
 .fab svg{width:20px;height:20px}
+.gbtn svg,.gate .btn svg,.composer .btn svg,.pub .btn svg{width:18px;height:18px;flex-shrink:0}
+.gate-foot .gbtn{text-decoration:none}

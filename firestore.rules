@@ -1,0 +1,77 @@
+rules_version = '2';
+// Reglas de seguridad · Sistema Integral SVB (proyecto Firebase rave-holding)
+// Publicar en: Firebase console → Firestore Database → Reglas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signed() { return request.auth != null; }
+    function email() { return request.auth.token.email.lower(); }
+    function superadmin() {
+      return signed() && request.auth.token.email_verified == true
+        && email() in ['vincularbusiness@gmail.com', 'raveholding@gmail.com'];
+    }
+    function memberPath() { return /databases/$(database)/documents/svb_members/$(email()); }
+    function isMember() { return signed() && request.auth.token.email != null && exists(memberPath()) && get(memberPath()).data.active == true; }
+    function role() { return get(memberPath()).data.role; }
+    function staff() { return superadmin() || (isMember() && role() in ['owner', 'partner', 'admin', 'employee', 'seller', 'technician']); }
+    function manager() { return superadmin() || (isMember() && role() in ['owner', 'partner']); }
+    function portal() { return !superadmin() && isMember() && role() in ['client_admin', 'client_user']; }
+    function myCid() { return get(memberPath()).data.clientId; }
+
+    // Quién tiene acceso y con qué rol (lo administran Dueño/Socio desde Ajustes → Usuarios)
+    match /svb_members/{em} {
+      allow read: if staff() || (signed() && em == email());
+      allow write: if manager();
+    }
+
+    // Configuración: «public» la ve cualquiera (nombre y canales de atención); el resto sólo el equipo
+    match /svb_meta/{id} {
+      allow read: if id == 'public' || staff();
+      allow write: if staff();
+    }
+
+    // Auditoría: sólo se agregan eventos, nunca se modifican ni borran
+    match /svb_audit/{id} {
+      allow read: if staff();
+      allow create: if staff() || portal();
+    }
+
+    // PDF de contratos (en partes)
+    match /svb_files/{id} {
+      allow read: if staff() || (portal() && resource.data._cid == myCid());
+      allow write: if staff();
+    }
+
+    // Canal de atención al público: cualquiera puede iniciar una consulta y seguir SU conversación
+    // (necesita conocer el id, que es aleatorio). Listar todas sólo el equipo.
+    match /svb_inbox/{id} {
+      allow get: if true;
+      allow list: if staff();
+      allow create: if request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'business', 'topic', 'status', 'channel', 'createdAt', 'updatedAt', 'lastFrom', 'unreadStaff', 'unreadVisitor', 'assignedTo', 'messages'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 80
+        && request.resource.data.status == 'new'
+        && request.resource.data.messages is list && request.resource.data.messages.size() == 1
+        && request.resource.data.messages[0].body is string && request.resource.data.messages[0].body.size() <= 2000
+        && request.resource.data.messages[0].from == 'visitor';
+      allow update: if staff() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['messages', 'updatedAt', 'lastFrom', 'unreadStaff', 'unreadVisitor'])
+        && request.resource.data.messages.size() >= resource.data.messages.size()
+        && request.resource.data.messages.size() <= resource.data.messages.size() + 1
+        && request.resource.data.messages.size() <= 300
+        && (request.resource.data.messages.size() == resource.data.messages.size()
+            || (request.resource.data.messages[request.resource.data.messages.size() - 1].from == 'visitor'
+                && request.resource.data.messages[request.resource.data.messages.size() - 1].body.size() <= 2000))
+      );
+      allow delete: if manager();
+    }
+
+    // Tablas del sistema (svbd_<tabla>): el equipo lee/escribe todo; usuarios sólo Dueño/Socio.
+    // El portal de clientes ve únicamente lo de su empresa (_cid) y puede abrir/responder tickets.
+    match /{coll}/{id} {
+      allow read: if coll.matches('svbd_.+') && (staff() || (portal() && (coll == 'svbd_plans' || resource.data._cid == myCid())));
+      allow write: if coll.matches('svbd_.+') && staff() && (coll != 'svbd_users' || manager());
+      allow create, update: if coll in ['svbd_tickets', 'svbd_ticketMessages', 'svbd_notifications'] && portal()
+        && request.resource.data._cid == myCid();
+    }
+  }
+}

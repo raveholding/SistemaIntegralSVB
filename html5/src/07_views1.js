@@ -53,21 +53,23 @@ function viewMonitor() {
   if (sel) UI.monitorRes = sel.id;
   const k = kpis(), manage = can("monitor.manage");
   const samples = sel ? (S.samples[sel.id] ?? []) : [];
+  const realOnly = !samples.length || samples[samples.length - 1].cpu == null;
+  if (realOnly) UI.monitorMetric = "lat";
   const m = UI.monitorMetric, last = samples[samples.length - 1];
   const TH = { cpu: [75, 90, "%", 100, "#7C8CFF"], mem: [75, 85, "%", 100, "#38BDF8"], lat: [800, 1500, "ms", null, "#22E39B"] }[m];
   const lv = last?.[m]; const lvTone = lv == null ? "subtle" : lv >= TH[1] ? "crit" : lv >= TH[0] ? "warn" : "ok";
   afterHooks.push(() => drawChart($("#chart"), samples, { key: m, warn: TH[0], crit: TH[1], unit: TH[2], max: TH[3], color: TH[4] }));
   const alerts = [...S.alerts].sort((a, b) => b.openedAt.localeCompare(a.openedAt)).slice(0, 25);
   const tg = S.settings.telegram;
-  return ph("Módulo 1", "Monitor de salud e infraestructura", "Telemetría de servidores y bases Supabase/PostgreSQL de cada cliente corporativo.",
-    `<span class="live"><i></i>Heartbeat cada ${S.settings.heartbeatSec} s</span>${manage ? btn("Reglas", "rules", { ic: "settings" }) + btn("Nuevo recurso", "res-new", { tone: "primary", ic: "plus" }) : ""}`) +
+  return ph("Módulo 1", "Monitor de salud e infraestructura", "Disponibilidad y latencia real de los sitios, sistemas y bases de cada cliente, con alertas.",
+    `<span class="live"><i></i>${S.settings.simulate ? "Simulación" : "Chequeo real"} cada ${S.settings.heartbeatSec} s${typeof Cloud !== "undefined" && Cloud.ready ? (Cloud.leader ? " · este equipo monitorea" : " · monitorea otro equipo") : ""}</span>${manage ? btn("Reglas", "rules", { ic: "settings" }) + btn("Nuevo recurso", "res-new", { tone: "primary", ic: "plus" }) : ""}`) +
   `<div class="grid g4 mb">${["operational", "degraded", "down", "maintenance"].map((s) => `<div class="card row" style="padding:14px 18px">${sdot(HEALTH[s][0], s === "down" && k.resCount[s])}<span class="muted">${HEALTH[s][1]}</span><b class="num" style="margin-left:auto;font-size:20px">${k.resCount[s] ?? 0}</b></div>`).join("")}</div>
   <div class="grid g3">
     ${card(sel ? esc(sel.name) : "Sin recursos", `<div class="card-b">
-        <div class="row between mb"><div class="tabs">${Object.entries(METRIC_LABEL).map(([key, l]) => `<button data-act="metric" data-id="${key}" class="${key === m ? "on" : ""}">${l}</button>`).join("")}</div>
+        <div class="row between mb"><div class="tabs">${Object.entries(METRIC_LABEL).filter(([key]) => !realOnly || key === "lat").map(([key, l]) => `<button data-act="metric" data-id="${key}" class="${key === m ? "on" : ""}">${l}</button>`).join("")}</div>
         <div class="num t-${lvTone}" style="font-size:24px;font-weight:650">${lv ?? "—"}<span class="small subtle"> ${TH[2]}</span></div></div>
         <canvas id="chart" class="chart"></canvas></div>`,
-      { cls: "span2", sub: sel ? `${esc(sel.clientId ? clientName(sel.clientId) : "Interno")} · ${esc(sel.region)} · último latido ${fmt.rel(sel.lastBeat)}` : "", action: sel ? `<div class="row wrap" style="justify-content:flex-end">${manage ? btn(sel.paused ? "Restaurar heartbeat" : "Cortar heartbeat", "res-pause", { sm: true, tone: sel.paused ? "success" : "ghost", data: { id: sel.id } }) + btn(sel.stress ? "Normalizar" : "Estrés", "res-stress", { sm: true, tone: sel.stress ? "danger" : "ghost", data: { id: sel.id } }) + btn(sel.status === "maintenance" ? "Fin mantenimiento" : "Mantenimiento", "res-maint", { sm: true, tone: "ghost", data: { id: sel.id } }) : ""}${mapPill(HEALTH, sel.status)}</div>` : "" })}
+      { cls: "span2", sub: sel ? `${esc(sel.clientId ? clientName(sel.clientId) : "Interno")} · ${esc(sel.region)} · ${esc(sel.endpoint || "")} · último chequeo ${fmt.rel(sel.lastBeat)}` : "", action: sel ? `<div class="row wrap" style="justify-content:flex-end">${manage ? (S.settings.simulate && !isHttpRes(sel) ? btn(sel.paused ? "Restaurar heartbeat" : "Cortar heartbeat", "res-pause", { sm: true, tone: sel.paused ? "success" : "ghost", data: { id: sel.id } }) + btn(sel.stress ? "Normalizar" : "Estrés", "res-stress", { sm: true, tone: sel.stress ? "danger" : "ghost", data: { id: sel.id } }) : "") + (isHttpRes(sel) ? `<a class="btn sm ghost" href="${esc(sel.endpoint)}" target="_blank" rel="noopener">Abrir</a>` : "") + btn("Editar", "res-edit", { sm: true, tone: "ghost", data: { id: sel.id } }) + btn(sel.status === "maintenance" ? "Fin mantenimiento" : "Mantenimiento", "res-maint", { sm: true, tone: "ghost", data: { id: sel.id } }) : ""}${mapPill(HEALTH, sel.status)}</div>` : "" })}
     ${card("Registro de alertas", `<ul class="list" style="max-height:372px;overflow:auto">${alerts.length ? alerts.map((a) => `<li style="${a.status === "resolved" ? "opacity:.55" : ""}">
         <div class="row">${mapPill(SEV, a.severity)}${a.notified ? pill("info", "Telegram ✓") : ""}<span class="xs subtle" style="margin-left:auto">${fmt.rel(a.openedAt)}</span></div>
         <div class="small" style="margin-top:6px;color:var(--fg)">${esc(a.title)}</div><div class="xs subtle">${esc(a.message)}</div>
@@ -78,14 +80,14 @@ function viewMonitor() {
   ${card("Recursos monitoreados", table(["Recurso", "Cliente", "Estado", "CPU", "Memoria", "Latencia", "Uptime 30 d", "Latido"], res.map((r) => {
     const s = (S.samples[r.id] ?? []).slice(-1)[0];
     const live = s && !r.paused && r.status !== "maintenance";
-    const b = (v, w, c) => live ? `<div style="min-width:80px">${bar(v, v > c ? "crit" : v > w ? "warn" : "ok")}<span class="xs num">${v.toFixed(0)} %</span></div>` : "—";
+    const b = (v, w, c) => live && v != null ? `<div style="min-width:80px">${bar(v, v > c ? "crit" : v > w ? "warn" : "ok")}<span class="xs num">${v.toFixed(0)} %</span></div>` : "—";
     return `<tr class="${r.id === sel?.id ? "sel" : ""}"><td><a href="#/monitor?r=${r.id}" class="t">${esc(r.name)}</a><div class="s" style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.endpoint)}">${esc(r.kind)} · ${esc(r.endpoint)}</div></td>
       <td>${esc(r.clientId ? clientName(r.clientId) : "Interno")}</td><td>${mapPill(HEALTH, r.status)}</td>
-      <td>${b(s?.cpu ?? 0, 75, 90)}</td><td>${b(s?.mem ?? 0, 75, 85)}</td>
+      <td>${b(s?.cpu ?? null, 75, 90)}</td><td>${b(s?.mem ?? null, 75, 85)}</td>
       <td class="num ${live && s.lat > 1500 ? "t-crit" : live && s.lat > 800 ? "t-warn" : ""}">${live ? s.lat + " ms" : "—"}</td>
       <td class="num">${uptime30(r).toFixed(2).replace(".", ",")} %</td><td class="xs">${fmt.rel(r.lastBeat)}</td>
       </td></tr>`;
-  })), { cls: "mt", sub: "Elegí un recurso para ver su gráfico. Simulación en el panel: «Cortar heartbeat» o «Estrés» para probar reglas y avisos" })}`;
+  })), { cls: "mt", sub: "Elegí un recurso para ver su gráfico. Los sitios y APIs (https://…) se chequean de verdad; CPU y memoria requieren el agente instalado en el servidor." })}`;
 }
 
 function viewDocs() {
@@ -167,8 +169,11 @@ function clientForm(c = {}) {
     ${field("Teléfono / WhatsApp", `<input class="in" name="phone" value="${esc(c.phone)}">`)}
     ${field("Ciudad", `<input class="in" name="city" value="${esc(c.city ?? "Salta")}">`)}
     ${field("Rubro", `<input class="in" name="industry" value="${esc(c.industry)}">`)}
+    ${field("Dirección", `<input class="in" name="address" value="${esc(c.address)}">`)}
+    ${field("Sitio / sistema (URL)", `<input class="in" name="web" type="url" placeholder="https://…" value="${esc(c.web)}">`)}
     ${field("Estado", `<select class="in" name="status">${opts(Object.entries(CLIENT_STATUS).map(([k, v]) => [k, v[1]]), c.status ?? "lead")}</select>`)}
     ${field("Responsable", `<select class="in" name="ownerId">${opts(S.users.filter((u) => STAFF_ROLES.includes(u.role) && u.active).map((u) => [u.id, u.name]), c.ownerId ?? currentUser().id)}</select>`)}
+    ${field("Notas", `<textarea class="in" name="notes" rows="2">${esc(c.notes)}</textarea>`, "", "full")}
   </div>`;
 }
 
@@ -180,7 +185,11 @@ function clientModal(id) {
   openModal(esc(c.tradeName || c.legalName), `
     <div class="row between mb">${mapPill(CLIENT_STATUS, c.status)}<div class="row">${can("crm.write") ? btn("Editar datos", "client-edit", { sm: true, data: { id } }) : ""}</div></div>
     <div class="fgrid small muted mb"><div>Razón social<div style="color:var(--fg)">${esc(c.legalName)}</div></div><div>CUIT / IVA<div style="color:var(--fg)">${esc(c.taxId || "—")} · ${esc(c.taxCondition)}</div></div>
-      <div style="margin-top:10px">Contacto<div style="color:var(--fg)">${esc(c.email || "—")} · ${esc(c.phone || "—")}</div></div><div style="margin-top:10px">Responsable<div style="color:var(--fg)">${esc(userName(c.ownerId))}</div></div></div>
+      <div style="margin-top:10px">Contacto<div style="color:var(--fg)">${esc(c.email || "—")} · ${esc(c.phone || "—")}</div></div><div style="margin-top:10px">Responsable<div style="color:var(--fg)">${esc(userName(c.ownerId))}</div></div>
+      ${c.address ? `<div style="margin-top:10px">Dirección<div style="color:var(--fg)">${esc(c.address)}</div></div>` : ""}
+      ${c.web ? `<div style="margin-top:10px">Sistema / sitio<div><a href="${esc(c.web)}" target="_blank" rel="noopener">${esc(c.web.replace(/^https?:\/\//, ""))}</a></div></div>` : ""}
+      ${c.phone ? `<div style="margin-top:10px">WhatsApp<div><a target="_blank" rel="noopener" href="https://wa.me/549${esc(c.phone.replace(/\D/g, "").replace(/^0/, ""))}">Escribir por WhatsApp</a></div></div>` : ""}
+      ${c.notes ? `<div class="full" style="margin-top:10px;grid-column:1/-1">Notas<div style="color:var(--fg)">${esc(c.notes)}</div></div>` : ""}</div>
     <div class="card" style="padding:16px;margin-bottom:16px"><div class="row between"><div><div class="eyebrow">Suscripción</div>
       ${s ? `<b>${esc(p.name)}</b> · ${fmt.money(subPrice(s))}/mes <span class="xs subtle">desde ${fmt.date(s.startedAt)}</span>` : '<span class="subtle">Sin suscripción activa</span>'}</div>
       <div class="row">${can("billing.manage") ? (s ? `<select class="in" id="cm-plan" style="width:auto;height:30px">${opts(S.plans.filter((x) => x.active && x.id !== p.id).map((x) => [x.id, `${x.name} · ${fmt.money(x.price)}`]))}</select>${btn("Cambiar plan", "cm-change", { sm: true, tone: "primary", data: { id: s.id } })}${btn("Baja", "cm-cancel", { sm: true, tone: "danger", data: { id: s.id } })}`

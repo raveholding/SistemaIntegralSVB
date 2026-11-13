@@ -2,15 +2,16 @@
 /* ════════════════════ LÓGICA DE NEGOCIO ════════════════════ */
 
 const clientName = (id) => { const c = db.get("clients", id); return c ? (c.tradeName || c.legalName) : "—"; };
-const userName = (id) => db.get("users", id)?.name ?? "—";
+const userName = (id) => db.get("users", id)?.name ?? (id && isPortalUser() ? "Equipo de soporte" : "—");
 const planOf = (sub) => sub ? db.get("plans", sub.planId) : null;
 const subPrice = (sub) => sub ? (sub.priceOverride ?? planOf(sub)?.price ?? 0) : 0;
 const activeSub = (clientId) => S.subscriptions.find((s) => s.clientId === clientId && s.status !== "canceled");
 
 /* ───────── Notificaciones + Telegram ───────── */
+function strHash(t) { let h1 = 0x811c9dc5, h2 = 5381; for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); h1 = Math.imul(h1 ^ c, 16777619); h2 = (Math.imul(h2, 33) + c) | 0; } return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }
 function notify({ kind, title, body = "", link = "", dedupe = null, severity = "info", telegram = false }) {
   if (dedupe && S.notifications.some((n) => n.dedupe === dedupe)) return null;
-  const n = { id: uid(), kind, title, body, link, dedupe, severity, at: nowISO(), read: false };
+  const n = { id: dedupe ? "n_" + strHash(dedupe) : uid(), kind, title, body, link, dedupe, severity, at: nowISO(), read: false };
   S.notifications.unshift(n); S.notifications = S.notifications.slice(0, 200); save();
   if (telegram) sendTelegram(severity, `${title}${body ? "\n" + body : ""}`);
   return n;

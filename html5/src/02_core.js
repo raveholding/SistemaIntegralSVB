@@ -86,7 +86,7 @@ const PERMS = [
   ["pos.operate", "Operar caja y emitir comprobantes"], ["pos.supervise", "Egresos, retiros y todas las cajas"], ["pos.void", "Anular comprobantes"],
   ["hr.read", "Ver equipo y metas"], ["hr.manage", "Editar equipo, metas y calcular comisiones"], ["commissions.approve", "Aprobar y pagar comisiones"],
   ["cms.read", "Ver sitio y métricas"], ["cms.write", "Editar páginas"], ["cms.publish", "Publicar y desplegar"],
-  ["tickets.read", "Ver tickets"], ["tickets.manage", "Responder y cerrar tickets"],
+  ["tickets.read", "Ver tickets"], ["tickets.manage", "Responder y cerrar tickets"], ["inbox.manage", "Atención al público (bandeja y canales)"],
   ["audit.read", "Consultar auditoría"], ["settings.manage", "Usuarios, roles y configuración"],
 ];
 const ALL_PERMS = PERMS.map((p) => p[0]);
@@ -98,17 +98,18 @@ const STAFF_ROLES = ["owner", "partner", "admin", "employee", "seller", "technic
 const DEFAULT_ROLE_PERMS = {
   owner: ALL_PERMS, partner: ALL_PERMS,
   admin: ALL_PERMS.filter((p) => !["monitor.manage", "commissions.approve", "settings.manage", "cms.publish"].includes(p)),
-  employee: ["crm.read", "pos.operate", "tickets.read", "cms.read", "docs.read"],
-  seller: ["crm.read", "crm.write", "docs.read", "pos.operate", "cms.read", "tickets.read"],
-  technician: ["monitor.read", "monitor.manage", "tickets.read", "tickets.manage", "cms.read", "cms.write", "crm.read"],
+  employee: ["crm.read", "pos.operate", "tickets.read", "cms.read", "docs.read", "inbox.manage"],
+  seller: ["crm.read", "crm.write", "docs.read", "pos.operate", "cms.read", "tickets.read", "inbox.manage"],
+  technician: ["monitor.read", "monitor.manage", "tickets.read", "tickets.manage", "cms.read", "cms.write", "crm.read", "inbox.manage"],
   client_admin: [], client_user: [],
 };
 
 /* ───────────── Estado + persistencia ───────────── */
 let S = null;
 let saveTimer = null;
-function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => { try { localStorage.setItem(APP_KEY, JSON.stringify(S)); } catch (e) { toast("No se pudo guardar localmente: " + e.message, "err"); } }, 150); }
-function saveNow() { clearTimeout(saveTimer); localStorage.setItem(APP_KEY, JSON.stringify(S)); }
+/* Con la nube activa los datos NO se guardan en localStorage: viven en Firestore (con la caché local de Firestore para trabajar sin señal). */
+function save() { if (typeof Cloud !== "undefined" && Cloud.on) return cloudSchedule(); clearTimeout(saveTimer); saveTimer = setTimeout(() => { try { localStorage.setItem(APP_KEY, JSON.stringify(S)); } catch (e) { toast("No se pudo guardar localmente: " + e.message, "err"); } }, 150); }
+function saveNow() { if (typeof Cloud !== "undefined" && Cloud.on) return cloudPush(); clearTimeout(saveTimer); localStorage.setItem(APP_KEY, JSON.stringify(S)); }
 
 const AUDITED = new Set(["clients", "users", "contracts", "contractVersions", "plans", "subscriptions", "subChanges", "sessions", "documents", "movements", "employees", "goals", "commissions", "pages", "sites", "resources", "alertRules", "alerts", "tickets", "leads", "interactions", "rolePerms", "deployments"]);
 const IMMUTABLE = new Set(["movements", "contractVersions", "pageVersions", "audit"]);
@@ -171,6 +172,7 @@ const db = {
 function currentUser() { return S?.session?.userId ? S.users.find((u) => u.id === S.session.userId) : null; }
 function permsOf(u) {
   if (!u) return [];
+  if (u.role === "owner") return ALL_PERMS;
   const base = new Set(S.rolePerms[u.role] ?? []);
   for (const [p, g] of Object.entries(u.overrides ?? {})) g ? base.add(p) : base.delete(p);
   return [...base];
@@ -189,10 +191,22 @@ const Files = (() => {
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   }));
   const tx = async (mode, fn) => { const d = await open(); return new Promise((res, rej) => { const t = d.transaction("files", mode); const st = t.objectStore("files"); const q = fn(st); t.oncomplete = () => res(q?.result); t.onerror = () => rej(t.error); }); };
-  return {
+  const local = {
     put: (key, blob) => tx("readwrite", (s) => s.put(blob, key)),
     get: (key) => tx("readonly", (s) => s.get(key)),
     clear: () => tx("readwrite", (s) => s.clear()),
+  };
+  return {
+    async put(key, blob) {
+      await local.put(key, blob).catch(() => { });
+      if (typeof Cloud !== "undefined" && Cloud.ready) { const v = S.contractVersions.find((x) => x.id === key); await CloudFiles.put(key, blob, v ? cidOf("contractVersions", v) : null); }
+    },
+    async get(key) {
+      const b = await local.get(key).catch(() => null); if (b) return b;
+      if (typeof Cloud !== "undefined" && Cloud.ready) { const c = await CloudFiles.get(key); if (c) { local.put(key, c).catch(() => { }); return c; } }
+      return null;
+    },
+    clear: local.clear,
   };
 })();
 </script>

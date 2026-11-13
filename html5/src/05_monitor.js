@@ -81,15 +81,52 @@ function uptime30(r) {
 }
 
 let monitorTimer = null;
+/* Chequeo REAL de disponibilidad: pide la página (sin leer su contenido) y mide la latencia.
+   Sirve para sitios en GitHub Pages, APIs y proyectos Supabase. 2 fallas seguidas ⇒ Caído. */
+const isHttpRes = (r) => /^https?:\/\//i.test(r.endpoint || "");
+async function checkHttp(url) {
+  const ctl = window.AbortController ? new AbortController() : null; const t0 = performance.now();
+  const to = setTimeout(() => ctl && ctl.abort(), 12000);
+  try { await fetch(url + (url.includes("?") ? "&" : "?") + "svbcheck=" + Date.now(), { mode: "no-cors", cache: "no-store", signal: ctl?.signal, redirect: "follow" }); return { ok: true, lat: Math.round(performance.now() - t0) }; }
+  catch (e) { return { ok: false, error: e.name === "AbortError" ? "Sin respuesta en 12 s" : "No responde" }; }
+  finally { clearTimeout(to); }
+}
+async function realCheck(r) {
+  const res = await checkHttp(r.endpoint);
+  if (!db.get("resources", r.id)) return;
+  const ts = nowISO();
+  if (res.ok) {
+    r.fails = 0; r.lastBeat = ts;
+    S.samples[r.id] = [...(S.samples[r.id] ?? []), { ts, cpu: null, mem: null, lat: res.lat }].slice(-MAX_SAMPLES);
+    resolveAlerts("hb:" + r.id);
+    let status = "operational";
+    for (const rule of S.alertRules.filter((x) => x.active && x.metric === "lat")) {
+      const fp = `rule:${rule.id}:${r.id}`;
+      if (breaches(rule, S.samples[r.id])) { status = rule.severity === "critical" ? "down" : "degraded"; openAlert(r, fp, rule.severity, `${r.name}: latencia ${rule.op} ${rule.threshold} ms`, `Respuesta en ${res.lat} ms durante ${rule.samples} chequeos`, res.lat, rule.id); }
+      else resolveAlerts(fp);
+    }
+    if (r.status !== "maintenance" && r.status !== status) db.update("resources", r.id, (() => { const o = { status, statusSince: ts }; if (r.status === "down") o.uptimeDownMs = (r.uptimeDownMs ?? 0) + (Date.now() - new Date(r.statusSince).getTime()); return o; })(), { silent: true });
+  } else {
+    r.fails = (r.fails ?? 0) + 1;
+    if (r.fails >= 2 && r.status !== "down" && r.status !== "maintenance") {
+      db.update("resources", r.id, { status: "down", statusSince: ts }, { silent: true });
+      openAlert(r, "hb:" + r.id, "critical", `${r.name}: no responde`, `${res.error} · ${r.endpoint}`);
+    }
+  }
+}
 function startMonitor() {
   clearInterval(monitorTimer);
+  const cloud = typeof Cloud !== "undefined" && Cloud.on;
   const tick = () => {
-    if (!S.settings.simulate) return;
-    for (const r of S.resources.filter((r) => r.active && !r.paused && r.status !== "maintenance")) heartbeat(r);
-    watchdog(); save();
-    rerenderIf(["dashboard", "monitor", "portal"], true);
+    if (cloud && (!Cloud.ready || !Cloud.leader)) { rerenderIf(["dashboard", "monitor", "portal"], true); return; }
+    const act = S.resources.filter((r) => r.active && r.status !== "maintenance");
+    if (S.settings.simulate) { for (const r of act.filter((r) => !r.paused && !isHttpRes(r))) heartbeat(r); watchdog(); save(); }
+    Promise.all(act.filter(isHttpRes).map((r) => realCheck(r).catch(() => { }))).then(() => {
+      save(); if (cloud) pushSamples();
+      rerenderIf(["dashboard", "monitor", "portal"], true);
+    });
   };
   tick();
-  monitorTimer = setInterval(tick, S.settings.heartbeatSec * 1000);
+  monitorTimer = setInterval(tick, Math.max(S.settings.simulate ? 2 : 30, S.settings.heartbeatSec || 60) * 1000);
 }
 </script>

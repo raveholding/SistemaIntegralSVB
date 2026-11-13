@@ -1,6 +1,11 @@
 <script>
 /* ════════════════════ ACCIONES (delegación de eventos) ════════════════════ */
 const val = (id) => $("#" + id)?.value ?? "";
+function cloudInitPass(email, pass) {
+  if (!pass || typeof Cloud === "undefined" || !Cloud.on) return;
+  if (pass.length < 6) return toast("La contraseña inicial debe tener al menos 6 caracteres", "err");
+  CloudAuth.createFor(email, pass).then((created) => toast(created ? `Acceso creado para ${email}` : `${email} ya tenía cuenta: puede usar «Olvidé mi contraseña»`, created ? "ok" : "warn")).catch((e) => toast(e.message, "err"));
+}
 const pinHash = (userId, pin) => SHA.hex("svb-pin|" + userId + "|" + String(pin ?? ""));
 function doLogin(id) { S.session.userId = id; audit("LOGIN", "users", id, null, { role: currentUser().role }); saveNow(); UI.search = ""; UI.sale = null; location.hash = isPortalUser() ? "" : "#/dashboard"; processExpirations(); render(); }
 const A = {
@@ -131,14 +136,14 @@ const A = {
   },
 
   /* ajustes */
-  "st-save": () => run(() => { need("settings.manage"); const hb = clamp(Number(val("st-hb")) || 3, 2, 60); const old = { ...S.settings }; Object.assign(S.settings, { company: val("st-company").trim() || "Mi empresa", cuit: val("st-cuit").trim(), heartbeatSec: hb, simulate: $("#st-sim").checked }); audit("UPDATE", "settings", "general", { company: old.company, heartbeatSec: old.heartbeatSec }, { company: S.settings.company, heartbeatSec: hb }); save(); startMonitor(); }, "Configuración guardada"),
+  "st-save": () => run(() => { need("settings.manage"); const sim = $("#st-sim").checked; const hb = clamp(Number(val("st-hb")) || 60, sim ? 2 : 30, 900); const old = { ...S.settings }; Object.assign(S.settings, { company: val("st-company").trim() || "Mi empresa", cuit: val("st-cuit").trim(), heartbeatSec: hb, simulate: sim }); audit("UPDATE", "settings", "general", { company: old.company, heartbeatSec: old.heartbeatSec }, { company: S.settings.company, heartbeatSec: hb }); save(); startMonitor(); }, "Configuración guardada"),
   "tg-save": () => run(() => { need("settings.manage"); Object.assign(S.settings.telegram, { token: val("tg-token").trim(), chatId: val("tg-chat").trim(), minSeverity: val("tg-min"), enabled: $("#tg-on").checked }); tgErrorShown = false; audit("UPDATE", "settings", "telegram", null, { chatId: S.settings.telegram.chatId, enabled: S.settings.telegram.enabled }); save(); }, "Telegram configurado"),
   "tg-test": async () => { A["tg-save"](); const tg = S.settings.telegram; if (!tg.token || !tg.chatId) return toast("Complete token y chat ID", "err"); const prev = tg.enabled; tg.enabled = true; tgErrorShown = false;
     const r = await sendTelegram("critical", "Mensaje de prueba: las alertas llegarán a este chat."); tg.enabled = prev; toast(r.ok ? "Mensaje enviado a Telegram ✓" : "No se pudo enviar: " + (r.error ?? "revise la configuración"), r.ok ? "ok" : "err"); },
-  "user-new": () => openModal("Nuevo usuario", userForm(), { submit: (f) => { const d = formData(f); if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos"); const nu = saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active }); if (d.pin) { db.update("users", nu.id, { pinHash: pinHash(nu.id, d.pin) }); } return "Usuario creado: ya puede ingresar"; } }),
+  "user-new": () => openModal("Nuevo usuario", userForm(), { submit: (f) => { const d = formData(f); if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos"); const nu = saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active }); if (d.pin) { db.update("users", nu.id, { pinHash: pinHash(nu.id, d.pin) }); } cloudInitPass(nu.email, d.initPass); return Cloud.on ? `Usuario creado: ya puede ingresar con ${nu.email}` : "Usuario creado: ya puede ingresar"; } }),
   "user-edit": (el) => { const u = db.get("users", el.dataset.id); openModal("Editar usuario", userForm(u), { wide: true, submit: (f) => { const d = formData(f); const ov = {}; for (const [k, v] of Object.entries(d)) if (k.startsWith("ov:") && v !== "") ov[k.slice(3)] = v === "1";
       if (u.id === currentUser().id && !d.active) throw new Error("No puede desactivar su propio usuario"); if (d.pin && !/^\d{4,8}$/.test(d.pin)) throw new Error("El PIN debe tener de 4 a 8 dígitos"); saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active, overrides: STAFF_ROLES.includes(d.role) ? ov : {} }, u.id);
-      if (d.pinClear) db.update("users", u.id, { pinHash: null }); else if (d.pin) db.update("users", u.id, { pinHash: pinHash(u.id, d.pin) }); return "Usuario actualizado"; } }); },
+      if (d.pinClear) db.update("users", u.id, { pinHash: null }); else if (d.pin) db.update("users", u.id, { pinHash: pinHash(u.id, d.pin) }); cloudInitPass(d.email.trim(), d.initPass); return "Usuario actualizado"; } }); },
   "data-export": () => { downloadText(`svb-respaldo-${todayISO()}.json`, JSON.stringify(S, null, 1), "application/json"); audit("EXPORT", "system", null, null, { backup: true }); save(); },
   "data-reset": async () => { if (!(await ask("Se borrarán todos los datos de este navegador y se cargará la demo.", { title: "Restablecer datos", ok: "Borrar y restablecer", danger: true }))) return; localStorage.removeItem(APP_KEY); try { await Files.clear(); } catch { } UI.sale = null; loadState(); startMonitor(); toast("Datos de demostración restablecidos"); render(); },
 };
@@ -199,20 +204,29 @@ document.addEventListener("submit", (ev) => {
 document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("#dialog-root").innerHTML && $("#modal-root").innerHTML) closeModal(); });
 window.addEventListener("hashchange", () => { UI.search = ""; UI.notifOpen = false; $("#side")?.classList.remove("open"); render(); window.scrollTo(0, 0); });
 window.addEventListener("resize", () => { if (route() === "monitor" && !isPortalUser()) rerenderIf(["monitor"], true); });
-window.addEventListener("storage", (e) => { if (e.key === APP_KEY && e.newValue) { S = JSON.parse(e.newValue); render(); } });
+window.addEventListener("storage", (e) => { if (!(typeof Cloud !== "undefined" && Cloud.on) && e.key === APP_KEY && e.newValue) { S = JSON.parse(e.newValue); render(); } });
 
 /* ════════════════════ INICIO ════════════════════ */
+/* Se arranca al terminar de cargar todos los bloques (10_cloudui define vistas usadas por render). */
+document.addEventListener("DOMContentLoaded", () => {
 try {
-  loadState();
-  try { processExpirations(); } catch (e) { console.error(e); }
-  startMonitor();
-  setInterval(() => { try { processExpirations(); } catch (e) { console.error(e); } }, 60 * 60 * 1000);
-  render();
-  window.__svbStarted = true;
+  if (typeof Cloud !== "undefined" && Cloud.on) {
+    S = emptyState();
+    render();                      // pantalla «Conectando…»
+    window.__svbStarted = true;
+    cloudBoot();
+    setInterval(() => { if (Cloud.ready && Cloud.leader) { try { processExpirations(); } catch (e) { console.error(e); } } }, 60 * 60 * 1000);
+  } else {
+    loadState();
+    try { processExpirations(); } catch (e) { console.error(e); }
+    startMonitor();
+    setInterval(() => { try { processExpirations(); } catch (e) { console.error(e); } }, 60 * 60 * 1000);
+    render();
+    window.__svbStarted = true;
+  }
 } catch (e) {
   console.error(e);
   window.__svbShowError && window.__svbShowError(e.message || e);
 }
+});
 </script>
-</body>
-</html>

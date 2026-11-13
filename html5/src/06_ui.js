@@ -25,6 +25,14 @@ const ICON_PATHS = {
   unlock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
   check: '<path d="M20 6 9 17l-5-5"/>', send: '<path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  install: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>',
+  cloud: '<path d="M17.5 19H8a6 6 0 1 1 5.7-7.9A4.5 4.5 0 1 1 17.5 19z"/>',
+  wa: '<path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8c-1-.4-1.9-1.3-2.3-2.3l.8-1-1-2z"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>',
+  cmd: '<path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 0 0 0-6z"/>',
 };
 const icon = (n, cls = "") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[n] ?? ""}</svg>`;
 
@@ -93,6 +101,7 @@ const ROUTES = [
   { id: "caja", label: "Caja y POS", ic: "pos", perm: "pos.operate" },
   { id: "rrhh", label: "Equipo", ic: "hr", perm: "hr.read" },
   { id: "cms", label: "Web y CMS", ic: "cms", perm: "cms.read" },
+  { id: "atencion", label: "Atención al público", ic: "chat", perm: "inbox.manage" },
   { id: "soporte", label: "Soporte", ic: "tickets", perm: "tickets.read" },
   { id: "auditoria", label: "Auditoría", ic: "audit", perm: "audit.read" },
   { id: "ajustes", label: "Ajustes", ic: "settings", perm: "settings.manage" },
@@ -117,16 +126,17 @@ function rerenderIf(routes, soft = false) {
 
 function render() {
   const root = $("#root");
+  if (route() === "contacto") { root.innerHTML = viewPublicChat(); afterRender(); return; }
   const u = currentUser();
-  if (!u) { root.innerHTML = viewLogin(); return; }
+  if (!u) { root.innerHTML = typeof Cloud !== "undefined" && Cloud.on ? viewCloudGate() : viewLogin(); afterRender(); return; }
   if (isPortalUser(u)) { root.innerHTML = viewPortal(); afterRender(); return; }
   let r = route();
   const def = ROUTES.find((x) => x.id === r);
   if (!def || (def.perm && !can(def.perm))) r = "dashboard";
-  const views = { dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, auditoria: viewAudit, ajustes: viewSettings };
+  const views = { dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, atencion: viewInbox, auditoria: viewAudit, ajustes: viewSettings };
   const k = kpis();
   const nav = ROUTES.filter((x) => !x.perm || can(x.perm)).map((x) => {
-    const badge = x.id === "monitor" ? k.openAlerts : x.id === "soporte" ? k.openTickets : 0;
+    const badge = x.id === "monitor" ? k.openAlerts : x.id === "soporte" ? k.openTickets : x.id === "atencion" ? inboxUnread() : 0;
     return `<a href="#/${x.id}" class="${x.id === r ? "active" : ""}">${icon(x.ic)}<span>${x.label}</span>${badge ? `<span class="badge" data-badge="${x.id}">${badge}</span>` : ""}</a>`;
   }).join("");
   const unread = S.notifications.filter((n) => !n.read).length;
@@ -144,10 +154,14 @@ function render() {
         <button class="iconbtn menu-toggle" data-act="menu">${icon("menu")}</button>
         <div class="search">${icon("search")}<input id="gsearch" placeholder="Buscar clientes, contratos, comprobantes…" value="${esc(UI.search)}" autocomplete="off"></div>
         <div class="top-right">
+          ${cloudBadge()}
+          <button class="iconbtn" data-act="palette" title="Ir a… (Ctrl+K)">${icon("cmd")}</button>
+          <button class="iconbtn" data-act="theme" title="Tema claro / oscuro">${icon(themeIsLight() ? "moon" : "sun")}</button>
+          ${installBtn()}
           <button class="iconbtn" data-act="notif" aria-label="Notificaciones">${icon("bell")}${unread ? '<span class="dot"></span>' : ""}</button>
           <div class="who"><b>${esc(u.name)}</b><span>${ROLES[u.role]}</span></div>
           <div class="avatar">${esc(u.name[0])}</div>
-          <button class="iconbtn" data-act="logout" title="Cambiar de usuario">${icon("logout")}</button>
+          <button class="iconbtn" data-act="logout" title="Cerrar sesión">${icon("logout")}</button>
         </div>
       </header>
       <main class="content" id="view" data-route="${r}">${UI.search ? viewSearch() : views[r]()}</main>
@@ -159,7 +173,7 @@ function render() {
 function updateBadges() {
   const k = kpis();
   const set = (id, v) => { const el = $(`[data-badge="${id}"]`); if (el) el.textContent = v; };
-  set("monitor", k.openAlerts); set("soporte", k.openTickets);
+  set("monitor", k.openAlerts); set("soporte", k.openTickets); set("atencion", inboxUnread());
 }
 const afterHooks = [];
 function afterRender() { while (afterHooks.length) { try { afterHooks.shift()(); } catch (e) { console.error(e); } } }

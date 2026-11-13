@@ -1,0 +1,14 @@
+<script type="module">
+/* Firebase (SDK modular desde el CDN oficial). Expone window.FB y avisa con el evento "fb-ready".
+   Este bloque NO se transpila (es un módulo ES nativo). */
+const V = "12.19.0", B = `https://www.gstatic.com/firebasejs/${V}/`;
+try {
+  const [app, auth, fs] = await Promise.all([import(B + "firebase-app.js"), import(B + "firebase-auth.js"), import(B + "firebase-firestore.js")]);
+  window.FB = { app, auth, fs, version: V };
+  window.dispatchEvent(new Event("fb-ready"));
+} catch (e) {
+  console.error("Firebase no cargó", e);
+  window.FB = null; window.FB_ERROR = e;
+  window.dispatchEvent(new Event("fb-ready"));
+}
+</script>

@@ -173,9 +173,9 @@ function viewCms() {
   `<div class="grid g2 mt">
     ${card("Despliegues", table(["Commit", "Estado", "Duración", "Por", "Cuándo"], deps.map((d) => `<tr><td class="mono xs t">${d.commit}</td><td>${mapPill(DEPLOY_STATUS, d.status)}</td><td class="num">${d.durationMs ? (d.durationMs / 1000).toFixed(1) + " s" : "—"}</td><td class="xs">${esc(userName(d.by))}</td><td class="xs">${fmt.rel(d.at)}</td></tr>`)))}
     ${card("Leads captados", table(["Contacto", "Origen", "Estado", ""], [...S.leads].sort((a, b) => b.at.localeCompare(a.at)).map((l) =>
-      `<tr><td><div class="t">${esc(l.name)}</div><div class="s">${esc(l.company || l.email || l.phone)} · ${fmt.rel(l.at)}</div></td><td class="xs">${esc(db.get("pages", l.pageId)?.title ?? "—")}</td>
+      `<tr><td><div class="t">${esc(l.name)}</div><div class="s">${esc(l.company || l.email || l.phone)} · ${fmt.rel(l.at)}</div></td><td class="xs">${esc(l.source || db.get("pages", l.pageId)?.title || "—")}</td>
        <td>${can("crm.write") && l.status !== "converted" ? `<select class="in" style="height:30px;width:auto" data-act-change="lead-status" data-id="${l.id}">${opts(Object.entries(LEAD_STATUS).filter(([k]) => k !== "converted").map(([k, v]) => [k, v[1]]), l.status)}</select>` : mapPill(LEAD_STATUS, l.status)}</td>
-       <td class="right">${can("crm.write") && l.status !== "converted" ? btn("A CRM", "lead-convert", { sm: true, data: { id: l.id } }) : ""}</td></tr>`)), { sub: "Formularios de landing → CRM" })}
+       <td class="right">${can("crm.write") && l.status !== "converted" ? btn("A CRM", "lead-convert", { sm: true, data: { id: l.id } }) : ""}</td></tr>`)), { sub: "Formularios de landing y atención al público → CRM" })}
   </div>`;
 }
 function landingHtml(p, interactive = true) {
@@ -267,8 +267,8 @@ function viewSettings() {
   `<div class="grid g2">
     ${card("Empresa y monitoreo", `<div class="card-b"><div class="fgrid">
       ${field("Nombre", `<input class="in" id="st-company" value="${esc(st.company)}">`)}${field("CUIT", `<input class="in" id="st-cuit" value="${esc(st.cuit)}">`)}
-      ${field("Intervalo de heartbeat (s)", `<input class="in" id="st-hb" type="number" min="2" max="60" value="${st.heartbeatSec}">`)}
-      <label class="row small muted" style="margin-top:22px"><input type="checkbox" id="st-sim" ${st.simulate ? "checked" : ""}> Simular telemetría (sin agentes reales)</label></div>
+      ${field("Intervalo de chequeo (s)", `<input class="in" id="st-hb" type="number" min="30" max="900" value="${st.heartbeatSec}">`, "Cada cuánto se revisa cada sitio o sistema (30 a 900 s).")}
+      <label class="row small muted" style="margin-top:22px"><input type="checkbox" id="st-sim" ${st.simulate ? "checked" : ""}> Simular CPU/memoria en recursos sin URL (sólo pruebas)</label></div>
       ${btn("Guardar", "st-save", { tone: "primary", sm: true })}</div>`)}
     ${card("Alertas por Telegram", `<div class="card-b">
       ${field("Token del bot", `<input class="in mono" id="tg-token" type="password" value="${esc(tg.token)}" placeholder="123456:ABC…">`, "Crealo con @BotFather. Se guarda sólo en este navegador.")}
@@ -283,15 +283,14 @@ function viewSettings() {
   card("Respaldo de datos", `<div class="card-b row wrap">
     ${btn("Exportar respaldo (JSON)", "data-export", { ic: "download" })}
     <label class="btn outline">${icon("upload")}Importar respaldo<input type="file" id="data-import" accept="application/json" hidden></label>
-    ${btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" })}
-    ${btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
-    <p class="xs subtle" style="flex-basis:100%">Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF.</p></div>`, { cls: "mt" });
+    ${typeof Cloud !== "undefined" && Cloud.on ? "" : btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" }) + btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
+    <p class="xs subtle" style="flex-basis:100%">${typeof Cloud !== "undefined" && Cloud.on ? "Los datos viven en la nube (Firebase · Firestore, São Paulo) y se sincronizan en tiempo real entre todos los equipos. Sin señal se sigue trabajando y se sube al volver la conexión. Igual conviene exportar un respaldo JSON cada tanto." : "Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF."}</p></div>`, { cls: "mt" });
 }
 function userForm(u = {}) {
   return `<div class="fgrid">${field("Nombre *", `<input class="in" name="name" value="${esc(u.name)}">`)}${field("Email *", `<input class="in" name="email" type="email" value="${esc(u.email)}">`)}
     ${field("Rol", `<select class="in" name="role">${opts(Object.entries(ROLES), u.role ?? "employee")}</select>`)}
     ${field("Empresa (sólo roles cliente)", `<select class="in" name="clientId">${opts([["", "—"], ...S.clients.map((c) => [c.id, c.tradeName || c.legalName])], u.clientId)}</select>`)}
-    ${field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
+    ${typeof Cloud !== "undefined" && Cloud.on ? field("Contraseña inicial (opcional)", `<input class="in" name="initPass" type="password" autocomplete="new-password" minlength="6" placeholder="Mín. 6 caracteres">`, "Crea su acceso con email y contraseña. Si usa Gmail también puede entrar con «Continuar con Google» sin contraseña.") : field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
     <label class="row small muted full"><input type="checkbox" name="active" ${u.active !== false ? "checked" : ""}> Usuario activo</label></div>
     ${u.id && STAFF_ROLES.includes(u.role) ? `<div class="eyebrow" style="margin:16px 0 8px">Excepciones de permisos (sobre el rol)</div>
       <div class="tw card"><table><tbody>${PERMS.map(([p, d]) => { const rp = S.rolePerms[u.role].includes(p); const ov = u.overrides?.[p];

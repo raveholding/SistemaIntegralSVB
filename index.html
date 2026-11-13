@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07090D">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SVB">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="preconnect" href="https://www.gstatic.com">
 <meta name="description" content="Sistema Integral SVB · Vincular Business: infraestructura, contratos, CRM, caja, RRHH, CMS y portal de clientes.">
 <title>Sistema Integral SVB · Vincular Business</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237C8CFF'/%3E%3Cstop offset='1' stop-color='%2338BDF8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='41' font-family='Arial' font-size='24' font-weight='700' text-anchor='middle' fill='%2307090D'%3EVB%3C/text%3E%3C/svg%3E">
@@ -198,6 +206,98 @@ td .t{color:var(--fg);font-weight:500}td .s{font-size:11px;color:var(--fg-subtle
   .menu-toggle{display:inline-flex}.g2,.g4{grid-template-columns:1fr}.who{display:none}.search{display:none}
   .content{padding:20px 14px 60px}.lp-feat{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}
 }
+
+/* ═══════ v2 nube · tema claro/oscuro · animaciones · acceso · atención ═══════ */
+html{color-scheme:dark}
+html[data-theme=light]{color-scheme:light;--ink-950:#F4F6FB;--ink-900:#FFFFFF;--ink-850:#FFFFFF;--ink-800:#FFFFFF;--ink-700:#E8ECF4;--ink-600:#D5DBE7;--fg:#0F172A;--fg-muted:#475569;--fg-subtle:#64748B;--line:rgba(15,23,42,.09);--line2:rgba(15,23,42,.05);--brand:#4F5BD5;--ok:#0E9F6E;--warn:#B7791F;--crit:#E02D4B;--info:#0284C7}
+html[data-theme=light] body{background-image:radial-gradient(1200px 600px at 10% -10%,rgba(79,91,213,.10),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(2,132,199,.07),transparent 60%)}
+html[data-theme=light] .side{background:rgba(255,255,255,.9)}
+html[data-theme=light] .top{background:rgba(244,246,251,.8)}
+html[data-theme=light] .card{background:rgba(255,255,255,.92);box-shadow:0 10px 30px -18px rgba(15,23,42,.25)}
+html[data-theme=light] .nav a:hover,html[data-theme=light] .iconbtn:hover,html[data-theme=light] .btn.ghost:hover,html[data-theme=light] .btn.outline:hover{background:rgba(15,23,42,.05)}
+html[data-theme=light] .nav a.active,html[data-theme=light] .tabs button.on{background:rgba(79,91,213,.12);color:var(--brand)}
+html[data-theme=light] .pill{box-shadow:inset 0 0 0 1px rgba(15,23,42,.12);background:rgba(15,23,42,.03)}
+html[data-theme=light] .btn.outline{box-shadow:inset 0 0 0 1px rgba(15,23,42,.18)}
+html[data-theme=light] .in{border-color:rgba(15,23,42,.14)}
+html[data-theme=light] tbody tr:hover{background:rgba(15,23,42,.025)}
+html[data-theme=light] tr.sel{background:rgba(79,91,213,.07)}
+html[data-theme=light] .bar,html[data-theme=light] .check{background:rgba(15,23,42,.08)}
+html[data-theme=light] .tile{background:#fff}
+html[data-theme=light] .modal,html[data-theme=light] .toast{box-shadow:0 30px 80px -30px rgba(15,23,42,.45)}
+html[data-theme=light] .logo-mark{color:#fff}
+
+/* animaciones suaves */
+@media (prefers-reduced-motion:no-preference){
+  #view{animation:viewin .28s cubic-bezier(.2,.7,.2,1)}
+  @keyframes viewin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{transition:transform .18s,box-shadow .18s,border-color .18s}
+  .kpi:hover,.tile:hover{transform:translateY(-2px)}
+  .nav a{transition:background .15s,color .15s,transform .15s}.nav a:hover{transform:translateX(2px)}
+  .btn:active{transform:scale(.97)}
+}
+
+/* indicador de nube */
+.sync{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--fg-muted);box-shadow:inset 0 0 0 1px var(--line);white-space:nowrap}
+.sync svg{width:15px;height:15px}.sync i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.sync.sync i{background:var(--info);box-shadow:0 0 8px var(--info);animation:pulse 1s infinite}
+.sync.err i{background:var(--crit);box-shadow:0 0 8px var(--crit)}
+.sync.off i{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+@keyframes pulse{50%{opacity:.35}}
+.install-btn{color:var(--brand)}
+@media (max-width:860px){.sync b{display:none}}
+
+/* pantalla de acceso */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate-card{width:100%;max-width:420px;padding:30px 28px;border-radius:24px;border:1px solid var(--line);background:var(--ink-850);box-shadow:0 30px 80px -30px rgba(0,0,0,.6);animation:viewin .35s}
+.gate-logo{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#07090D;background:linear-gradient(135deg,#7C8CFF,#38BDF8);box-shadow:0 12px 30px -10px rgba(124,140,255,.7);margin-bottom:16px}
+.gate h1{font-size:22px;margin:0 0 4px}.gate p{margin:0}
+.gbtn{width:100%;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--ink-900);color:var(--fg);font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.15s}
+.gbtn:hover{border-color:var(--brand)}
+.or{display:flex;align-items:center;gap:10px;color:var(--fg-subtle);font-size:12px;margin:16px 0}.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.gate form .in{height:44px;margin-bottom:10px}
+.gate .links{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:12.5px}
+.gate .links a{cursor:pointer}
+.gate-foot{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;gap:8px}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:rot .8s linear infinite;margin:6px auto 14px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* atención al público: chat */
+.chat{display:flex;flex-direction:column;gap:10px;padding:16px;max-height:52vh;min-height:220px;overflow:auto}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;animation:viewin .2s}
+.msg small{display:block;font-size:10.5px;opacity:.65;margin-top:4px}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#7C8CFF,#5B6CF0);color:#fff;border-bottom-right-radius:5px}
+.msg.them{align-self:flex-start;background:var(--ink-700);border-bottom-left-radius:5px}
+.msg.sys{align-self:center;background:transparent;color:var(--fg-subtle);font-size:12px}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.composer textarea{flex:1;min-height:44px;max-height:140px}
+.pub{min-height:100vh;padding:24px 14px 60px}
+.pub-wrap{max-width:720px;margin:0 auto}
+.pub-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.chans{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.chan{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--ink-850);color:var(--fg);text-decoration:none;font-weight:600;font-size:13px;transition:.15s}
+.chan:hover{border-color:var(--brand);transform:translateY(-2px)}.chan svg{width:20px;height:20px}
+.chan.wa{color:#22C55E}.chan.ig{color:#E1306C}.chan.fb{color:#3B82F6}.chan.mail{color:var(--info)}
+.inbox{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start}
+.inbox-list{max-height:calc(100vh - 230px);overflow:auto}
+.conv{display:block;padding:12px 14px;border-bottom:1px solid var(--line2);cursor:pointer;transition:.12s}
+.conv:hover{background:rgba(124,140,255,.06)}.conv.on{background:rgba(124,140,255,.12)}
+.conv .n{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:13px}
+.conv .p{font-size:12px;color:var(--fg-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.conv.unread .n:after{content:"";width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 8px var(--brand);flex-shrink:0;margin-top:5px}
+@media (max-width:960px){.inbox{grid-template-columns:1fr}.inbox-list{max-height:320px}}
+
+/* paleta de comandos */
+.pal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;padding-top:12vh}
+.pal-box{width:min(560px,92vw);background:var(--ink-850);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);height:max-content;animation:viewin .18s}
+.pal-box input{width:100%;height:52px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--fg);padding:0 18px;font-size:15px;outline:0}
+.pal-box ul{list-style:none;margin:0;padding:6px;max-height:50vh;overflow:auto}
+.pal-box li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13.5px}
+.pal-box li svg{width:16px;height:16px;color:var(--fg-subtle)}
+.pal-box li.on,.pal-box li:hover{background:rgba(124,140,255,.12)}
+.pal-box li span{margin-left:auto;font-size:11px;color:var(--fg-subtle)}
+/* botón flotante de ayuda en el acceso */
+.fab{position:fixed;right:18px;bottom:18px;z-index:30;display:flex;align-items:center;gap:8px;height:48px;padding:0 18px;border-radius:99px;border:0;background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;font-weight:700;box-shadow:0 14px 30px -10px rgba(34,197,94,.7);text-decoration:none}
+.fab svg{width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -376,6 +476,7 @@ const PERMS = [
   ["cms.publish", "Publicar y desplegar"],
   ["tickets.read", "Ver tickets"],
   ["tickets.manage", "Responder y cerrar tickets"],
+  ["inbox.manage", "Atención al público (bandeja y canales)"],
   ["audit.read", "Consultar auditoría"],
   ["settings.manage", "Usuarios, roles y configuración"]
 ];
@@ -395,15 +496,16 @@ const DEFAULT_ROLE_PERMS = {
   owner: ALL_PERMS,
   partner: ALL_PERMS,
   admin: ALL_PERMS.filter((p) => !["monitor.manage", "commissions.approve", "settings.manage", "cms.publish"].includes(p)),
-  employee: ["crm.read", "pos.operate", "tickets.read", "cms.read", "docs.read"],
-  seller: ["crm.read", "crm.write", "docs.read", "pos.operate", "cms.read", "tickets.read"],
-  technician: ["monitor.read", "monitor.manage", "tickets.read", "tickets.manage", "cms.read", "cms.write", "crm.read"],
+  employee: ["crm.read", "pos.operate", "tickets.read", "cms.read", "docs.read", "inbox.manage"],
+  seller: ["crm.read", "crm.write", "docs.read", "pos.operate", "cms.read", "tickets.read", "inbox.manage"],
+  technician: ["monitor.read", "monitor.manage", "tickets.read", "tickets.manage", "cms.read", "cms.write", "crm.read", "inbox.manage"],
   client_admin: [],
   client_user: []
 };
 let S = null;
 let saveTimer = null;
 function save() {
+  if (typeof Cloud !== "undefined" && Cloud.on) return cloudSchedule();
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     try {
@@ -414,6 +516,7 @@ function save() {
   }, 150);
 }
 function saveNow() {
+  if (typeof Cloud !== "undefined" && Cloud.on) return cloudPush();
   clearTimeout(saveTimer);
   localStorage.setItem(APP_KEY, JSON.stringify(S));
 }
@@ -493,6 +596,7 @@ function currentUser() {
 function permsOf(u) {
   var _a, _b;
   if (!u) return [];
+  if (u.role === "owner") return ALL_PERMS;
   const base = new Set((_a = S.rolePerms[u.role]) != null ? _a : []);
   for (const [p, g] of Object.entries((_b = u.overrides) != null ? _b : {})) g ? base.add(p) : base.delete(p);
   return [...base];
@@ -502,7 +606,7 @@ const isPortalUser = (u = currentUser()) => u && (u.role === "client_admin" || u
 function need(p) {
   if (!can(p)) throw new Error(`Permiso denegado: ${p}`);
 }
-const Files = /* @__PURE__ */ (() => {
+const Files = (() => {
   let dbp = null;
   const open = () => dbp || (dbp = new Promise((res, rej) => {
     if (!window.indexedDB) return rej(new Error("IndexedDB no disponible"));
@@ -521,12 +625,650 @@ const Files = /* @__PURE__ */ (() => {
       t.onerror = () => rej(t.error);
     });
   };
-  return {
+  const local = {
     put: (key, blob) => tx("readwrite", (s) => s.put(blob, key)),
     get: (key) => tx("readonly", (s) => s.get(key)),
     clear: () => tx("readwrite", (s) => s.clear())
   };
+  return {
+    async put(key, blob) {
+      await local.put(key, blob).catch(() => {
+      });
+      if (typeof Cloud !== "undefined" && Cloud.ready) {
+        const v = S.contractVersions.find((x) => x.id === key);
+        await CloudFiles.put(key, blob, v ? cidOf("contractVersions", v) : null);
+      }
+    },
+    async get(key) {
+      const b = await local.get(key).catch(() => null);
+      if (b) return b;
+      if (typeof Cloud !== "undefined" && Cloud.ready) {
+        const c = await CloudFiles.get(key);
+        if (c) {
+          local.put(key, c).catch(() => {
+          });
+          return c;
+        }
+      }
+      return null;
+    },
+    clear: local.clear
+  };
 })();
+</script>
+<script>
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCIm2QWiHGuMU846qtfoSBdi4j_7tfDedA",
+  authDomain: "rave-holding.firebaseapp.com",
+  projectId: "rave-holding",
+  storageBucket: "rave-holding.firebasestorage.app",
+  messagingSenderId: "770821596165",
+  appId: "1:770821596165:web:bd124af2976ccb9736686c"
+};
+const SUPERADMINS = ["vincularbusiness@gmail.com", "raveholding@gmail.com"];
+const SYNC_COLS = ["users", "clients", "interactions", "plans", "subscriptions", "subChanges", "contracts", "contractVersions", "resources", "alertRules", "alerts", "registers", "sessions", "documents", "movements", "schemes", "employees", "goals", "commissions", "sites", "pages", "pageVersions", "deployments", "leads", "tickets", "ticketMessages", "notifications"];
+const PORTAL_READ = ["clients", "subscriptions", "contracts", "contractVersions", "documents", "resources", "tickets", "ticketMessages"];
+const PORTAL_WRITE = ["tickets", "ticketMessages", "notifications"];
+const LOCAL_FIELDS = { resources: ["lastBeat", "fails"] };
+const colRef = (c) => "svbd_" + c;
+const STAFF_SET = /* @__PURE__ */ new Set(["owner", "partner", "admin", "employee", "seller", "technician"]);
+const Cloud = {
+  on: true,
+  fb: null,
+  app: null,
+  auth: null,
+  db: null,
+  user: null,
+  email: "",
+  member: null,
+  role: null,
+  cid: null,
+  superadmin: false,
+  ready: false,
+  phase: "boot",
+  // boot · auth · loading · pending · ready · error
+  error: "",
+  unsubs: [],
+  last: {},
+  metaLast: "",
+  pubLast: "",
+  membersLast: {},
+  auditSent: /* @__PURE__ */ new Set(),
+  timer: null,
+  pushing: false,
+  again: false,
+  status: "idle",
+  leader: false,
+  leaderTimer: null,
+  device: (() => {
+    try {
+      let d = localStorage.getItem("svb_device");
+      if (!d) {
+        d = uid();
+        localStorage.setItem("svb_device", d);
+      }
+      return d;
+    } catch (e) {
+      return uid();
+    }
+  })(),
+  get staff() {
+    return this.superadmin || STAFF_SET.has(this.role);
+  },
+  get portal() {
+    return !this.superadmin && (this.role === "client_admin" || this.role === "client_user");
+  },
+  get manager() {
+    return this.superadmin || this.role === "owner" || this.role === "partner";
+  }
+};
+function emptyState() {
+  const s = { version: 1, demo: false, createdAt: nowISO(), session: { userId: null }, settings: { company: "Vincular Business", cuit: "", heartbeatSec: 60, telegram: { token: "", chatId: "", minSeverity: "warning", enabled: false }, simulate: false, channels: {} }, rolePerms: structuredClone(DEFAULT_ROLE_PERMS), metrics: {}, samples: {}, seq: {}, audit: [] };
+  for (const c of SYNC_COLS) s[c] = [];
+  return s;
+}
+function cidOf(c, row) {
+  var _a, _b, _c, _d;
+  if (c === "clients") return row.id;
+  if (row.clientId) return row.clientId;
+  if (c === "ticketMessages") return (_b = (_a = S.tickets.find((t) => t.id === row.ticketId)) == null ? void 0 : _a.clientId) != null ? _b : null;
+  if (c === "contractVersions") return (_d = (_c = S.contracts.find((k) => k.id === row.contractId)) == null ? void 0 : _c.clientId) != null ? _d : null;
+  if (c === "notifications" && Cloud.portal) return Cloud.cid;
+  return null;
+}
+function cloudRow(c, row) {
+  var _a;
+  const o = JSON.parse(JSON.stringify(row));
+  for (const k of (_a = LOCAL_FIELDS[c]) != null ? _a : []) delete o[k];
+  return o;
+}
+const metaOf = () => JSON.stringify({ settings: S.settings, rolePerms: S.rolePerms, seq: S.seq, metrics: S.metrics, createdAt: S.createdAt });
+function cloudBoot() {
+  const go = () => {
+    if (!window.FB) {
+      Cloud.phase = "error";
+      Cloud.error = "No se pudo conectar con la nube. Revisá tu conexión a internet y volvé a intentar.";
+      render();
+      return;
+    }
+    try {
+      const { app, auth, fs } = window.FB;
+      Cloud.fb = window.FB;
+      Cloud.app = app.initializeApp(FIREBASE_CONFIG);
+      Cloud.auth = auth.getAuth(Cloud.app);
+      auth.useDeviceLanguage(Cloud.auth);
+      try {
+        Cloud.db = fs.initializeFirestore(Cloud.app, { ignoreUndefinedProperties: true, localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) });
+      } catch (e) {
+        console.warn("Caché local no disponible", e);
+        Cloud.db = fs.getFirestore(Cloud.app);
+      }
+      Cloud.phase = "auth";
+      auth.onAuthStateChanged(Cloud.auth, (u) => cloudUser(u).catch((e) => {
+        console.error(e);
+        Cloud.phase = "error";
+        Cloud.error = e.message || String(e);
+        render();
+      }));
+      auth.getRedirectResult(Cloud.auth).catch((e) => toast(authMsg(e), "err"));
+    } catch (e) {
+      console.error(e);
+      Cloud.phase = "error";
+      Cloud.error = e.message;
+      render();
+    }
+  };
+  if (window.FB !== void 0) go();
+  else window.addEventListener("fb-ready", go, { once: true });
+}
+function cloudStop() {
+  Cloud.unsubs.forEach((f) => {
+    try {
+      f();
+    } catch (e) {
+    }
+  });
+  Cloud.unsubs = [];
+  clearInterval(Cloud.leaderTimer);
+  clearInterval(monitorTimer);
+  clearTimeout(Cloud.timer);
+  Cloud.ready = false;
+  Cloud.leader = false;
+  Cloud.last = {};
+  Cloud.metaLast = "";
+  Cloud.pubLast = "";
+  Cloud.membersLast = {};
+  Cloud.auditSent = /* @__PURE__ */ new Set();
+}
+async function cloudUser(u) {
+  var _a, _b;
+  cloudStop();
+  S = emptyState();
+  Cloud.user = u;
+  Cloud.member = null;
+  Cloud.role = null;
+  Cloud.cid = null;
+  if (!u) {
+    Cloud.phase = "auth";
+    render();
+    return;
+  }
+  const { fs } = Cloud.fb;
+  Cloud.email = (u.email || "").toLowerCase();
+  Cloud.superadmin = !!u.emailVerified && SUPERADMINS.includes(Cloud.email);
+  Cloud.phase = "loading";
+  render();
+  let m = null;
+  try {
+    const snap = await fs.getDoc(fs.doc(Cloud.db, "svb_members", Cloud.email));
+    m = snap.exists() ? snap.data() : null;
+  } catch (e) {
+    if (!Cloud.superadmin) {
+      Cloud.phase = "pending";
+      render();
+      return;
+    }
+  }
+  if ((!m || m.active === false) && !Cloud.superadmin) {
+    Cloud.phase = "pending";
+    render();
+    return;
+  }
+  Cloud.member = m;
+  Cloud.role = Cloud.superadmin ? "owner" : m.role;
+  Cloud.cid = (m == null ? void 0 : m.clientId) || null;
+  if (Cloud.staff) {
+    const meta = await fs.getDoc(fs.doc(Cloud.db, "svb_meta", "main")).catch(() => null);
+    if (!meta || !meta.exists()) {
+      if (!Cloud.manager) {
+        Cloud.phase = "pending";
+        Cloud.error = "El sistema todavía no fue inicializado por un administrador.";
+        render();
+        return;
+      }
+      await cloudBootstrap(u);
+    }
+  }
+  await cloudSubscribe();
+  let me = S.users.find((x) => (x.email || "").toLowerCase() === Cloud.email);
+  if (!me && Cloud.superadmin) {
+    me = db.insert("users", { name: u.displayName || Cloud.email.split("@")[0], email: Cloud.email, role: "owner", clientId: null, overrides: {}, active: true });
+  }
+  if (!me || me.active === false) {
+    Cloud.phase = "pending";
+    render();
+    return;
+  }
+  if (Cloud.superadmin && me.role !== "owner") me.role = "owner";
+  S.session.userId = me.id;
+  Cloud.ready = true;
+  Cloud.phase = "ready";
+  window.__svbStarted = true;
+  audit("LOGIN", "users", me.id, null, { role: me.role, via: ((_b = (_a = u.providerData) == null ? void 0 : _a[0]) == null ? void 0 : _b.providerId) || "password" });
+  cloudPush();
+  if (Cloud.staff) {
+    leaderLoop();
+    try {
+      processExpirations();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  startMonitor();
+  if (!location.hash || location.hash === "#" || location.hash.startsWith("#/acceso")) location.hash = isPortalUser() ? "" : "#/dashboard";
+  render();
+  inboxListen();
+}
+async function cloudBootstrap(u) {
+  const st = realState({ ownerName: u.displayName || "Administrador", ownerEmail: (u.email || "").toLowerCase() });
+  S = st;
+  audit("SYSTEM_INIT", "system", null, null, { company: S.settings.company, cloud: "firebase" });
+  Cloud.ready = true;
+  await cloudPush(true);
+  Cloud.ready = false;
+  S = emptyState();
+  Cloud.last = {};
+  Cloud.metaLast = "";
+  Cloud.pubLast = "";
+  Cloud.auditSent = /* @__PURE__ */ new Set();
+  Cloud.membersLast = {};
+}
+function cloudSubscribe() {
+  const { fs } = Cloud.fb;
+  const waits = [];
+  const listen = (q, onSnap) => new Promise((ok) => {
+    let first = true;
+    const un = fs.onSnapshot(q, { includeMetadataChanges: false }, (snap) => {
+      onSnap(snap, first);
+      if (first) {
+        first = false;
+        ok();
+      }
+    }, (err) => {
+      console.warn("Lectura rechazada", err.code, err.message);
+      if (first) {
+        first = false;
+        ok();
+      }
+    });
+    Cloud.unsubs.push(un);
+  });
+  const cols = Cloud.staff ? SYNC_COLS : PORTAL_READ;
+  for (const c of cols) {
+    Cloud.last[c] = /* @__PURE__ */ new Map();
+    const ref = fs.collection(Cloud.db, colRef(c));
+    const q = Cloud.staff ? ref : fs.query(ref, fs.where("_cid", "==", Cloud.cid));
+    waits.push(listen(q, (snap, first) => applySnap(c, snap, first)));
+  }
+  if (Cloud.portal) {
+    for (const c of PORTAL_WRITE) if (!Cloud.last[c]) Cloud.last[c] = /* @__PURE__ */ new Map();
+  }
+  if (!Cloud.staff) {
+    Cloud.last.plans = /* @__PURE__ */ new Map();
+    waits.push(listen(fs.collection(Cloud.db, colRef("plans")), (snap) => applySnap("plans", snap)));
+  }
+  if (Cloud.staff) {
+    waits.push(listen(fs.doc(Cloud.db, "svb_meta", "main"), (snap) => {
+      var _a, _b;
+      if (!snap.exists()) return;
+      const d = snap.data();
+      const j = JSON.stringify({ settings: d.settings, rolePerms: d.rolePerms, seq: (_a = d.seq) != null ? _a : {}, metrics: (_b = d.metrics) != null ? _b : {}, createdAt: d.createdAt });
+      if (j === Cloud.metaLast) return;
+      Cloud.metaLast = j;
+      const o = JSON.parse(j);
+      S.settings = __spreadValues(__spreadValues({}, emptyState().settings), o.settings);
+      S.rolePerms = __spreadValues(__spreadValues({}, DEFAULT_ROLE_PERMS), o.rolePerms);
+      S.seq = o.seq;
+      S.metrics = o.metrics;
+      S.createdAt = o.createdAt || S.createdAt;
+      S.rolePerms.owner = ALL_PERMS;
+      S.rolePerms.partner = ALL_PERMS;
+      remoteRender();
+    }));
+    waits.push(listen(fs.query(fs.collection(Cloud.db, "svb_audit"), fs.orderBy("id")), (snap) => {
+      for (const ch of snap.docChanges()) {
+        if (ch.type !== "added") continue;
+        const e = ch.doc.data();
+        if (Cloud.auditSent.has(e.hash)) continue;
+        Cloud.auditSent.add(e.hash);
+        if (!S.audit.some((x) => x.hash === e.hash)) S.audit.push(e);
+      }
+      S.audit.sort((a, b) => a.id - b.id || String(a.ts).localeCompare(String(b.ts)));
+      remoteRender(["auditoria"]);
+    }));
+    waits.push(listen(fs.doc(Cloud.db, "svb_meta", "samples"), (snap) => {
+      if (!snap.exists() || Cloud.leader) return;
+      const d = snap.data().data || {};
+      S.samples = d;
+      for (const r of S.resources) {
+        const a = d[r.id];
+        if (a && a.length) r.lastBeat = a[a.length - 1].ts;
+      }
+      remoteRender(["dashboard", "monitor"]);
+    }));
+  } else {
+    waits.push(listen(fs.doc(Cloud.db, "svb_meta", "public"), (snap) => {
+      if (snap.exists()) {
+        S.settings.company = snap.data().company || S.settings.company;
+        remoteRender();
+      }
+    }));
+  }
+  return Promise.all(waits);
+}
+function applySnap(c, snap) {
+  var _a;
+  const last = Cloud.last[c] || (Cloud.last[c] = /* @__PURE__ */ new Map());
+  let changed = false;
+  for (const ch of snap.docChanges()) {
+    const id = ch.doc.id;
+    if (ch.type === "removed") {
+      last.delete(id);
+      const i2 = S[c].findIndex((x) => x.id === id);
+      if (i2 >= 0) {
+        S[c].splice(i2, 1);
+        changed = true;
+      }
+      continue;
+    }
+    const d = ch.doc.data();
+    delete d._cid;
+    delete d._by;
+    delete d._at;
+    const j = JSON.stringify(d);
+    if (last.get(id) === j) continue;
+    last.set(id, j);
+    const i = S[c].findIndex((x) => x.id === id);
+    if (i >= 0) {
+      const keep = {};
+      for (const k of (_a = LOCAL_FIELDS[c]) != null ? _a : []) if (S[c][i][k] !== void 0) keep[k] = S[c][i][k];
+      S[c][i] = Object.assign(d, keep);
+    } else S[c].push(d);
+    changed = true;
+  }
+  if (changed) {
+    if (c === "notifications") S.notifications.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    remoteRender();
+  }
+}
+let rrTimer = null;
+function remoteRender(routes) {
+  if (!Cloud.ready) return;
+  clearTimeout(rrTimer);
+  rrTimer = setTimeout(() => {
+    try {
+      rerenderIf(routes || ROUTES.map((r) => r.id).concat(["portal"]), true);
+    } catch (e) {
+      console.error(e);
+    }
+  }, 120);
+}
+function cloudSchedule() {
+  if (!Cloud.ready) return;
+  clearTimeout(Cloud.timer);
+  Cloud.timer = setTimeout(cloudPush, 500);
+}
+async function cloudPush(force = false) {
+  if (!Cloud.ready || !Cloud.db) return;
+  if (Cloud.pushing) {
+    Cloud.again = true;
+    return;
+  }
+  Cloud.pushing = true;
+  clearTimeout(Cloud.timer);
+  const { fs } = Cloud.fb;
+  const ops = [];
+  try {
+    const cols = Cloud.staff ? SYNC_COLS : PORTAL_WRITE;
+    for (const c of cols) {
+      const last = Cloud.last[c] || (Cloud.last[c] = /* @__PURE__ */ new Map());
+      if (c === "users" && !Cloud.manager && !force) continue;
+      const seen = /* @__PURE__ */ new Set();
+      for (const row of S[c]) {
+        if (!row || !row.id) continue;
+        seen.add(row.id);
+        const o = cloudRow(c, row), j = JSON.stringify(o);
+        if (last.get(row.id) === j) continue;
+        last.set(row.id, j);
+        ops.push(["set", fs.doc(Cloud.db, colRef(c), String(row.id)), __spreadProps(__spreadValues({}, o), { _cid: cidOf(c, row), _by: Cloud.email, _at: Date.now() })]);
+      }
+      if (Cloud.staff) {
+        for (const id of [...last.keys()]) if (!seen.has(id)) {
+          last.delete(id);
+          ops.push(["del", fs.doc(Cloud.db, colRef(c), String(id))]);
+        }
+      }
+    }
+    if (Cloud.staff) {
+      const m = metaOf();
+      if (m !== Cloud.metaLast) {
+        Cloud.metaLast = m;
+        ops.push(["set", fs.doc(Cloud.db, "svb_meta", "main"), __spreadProps(__spreadValues({}, JSON.parse(m)), { updatedAt: Date.now(), by: Cloud.email })]);
+      }
+      const pub = JSON.stringify({ company: S.settings.company, channels: S.settings.channels || {} });
+      if (pub !== Cloud.pubLast) {
+        Cloud.pubLast = pub;
+        ops.push(["set", fs.doc(Cloud.db, "svb_meta", "public"), JSON.parse(pub)]);
+      }
+    }
+    if (Cloud.manager) {
+      const cur = {};
+      for (const u of S.users) if (u.email) cur[u.email.toLowerCase()] = JSON.stringify({ role: u.role, clientId: u.clientId || null, active: u.active !== false, name: u.name });
+      for (const [em, j] of Object.entries(cur)) if (Cloud.membersLast[em] !== j) {
+        Cloud.membersLast[em] = j;
+        ops.push(["set", fs.doc(Cloud.db, "svb_members", em), __spreadProps(__spreadValues({}, JSON.parse(j)), { updatedAt: Date.now() })]);
+      }
+      for (const em of Object.keys(Cloud.membersLast)) if (!cur[em]) {
+        delete Cloud.membersLast[em];
+        ops.push(["del", fs.doc(Cloud.db, "svb_members", em)]);
+      }
+    }
+    for (const e of S.audit) if (!Cloud.auditSent.has(e.hash)) {
+      Cloud.auditSent.add(e.hash);
+      ops.push(["set", fs.doc(Cloud.db, "svb_audit", e.hash.slice(0, 40)), JSON.parse(JSON.stringify(e))]);
+    }
+    if (!ops.length) {
+      setSync("ok");
+      return;
+    }
+    setSync("sync");
+    for (let i = 0; i < ops.length; i += 400) {
+      const b = fs.writeBatch(Cloud.db);
+      for (const [k, ref, data] of ops.slice(i, i + 400)) k === "set" ? b.set(ref, data) : b.delete(ref);
+      await b.commit();
+    }
+    setSync("ok");
+  } catch (e) {
+    console.error("Error al guardar en la nube", e);
+    setSync("err", e.code === "permission-denied" ? "Sin permiso para guardar ese cambio en la nube" : e.message);
+  } finally {
+    Cloud.pushing = false;
+    if (Cloud.again) {
+      Cloud.again = false;
+      cloudSchedule();
+    }
+  }
+}
+function setSync(st, msg = "") {
+  const prev = Cloud.status;
+  Cloud.status = st;
+  const el = document.getElementById("sync-ind");
+  if (el) {
+    el.className = "sync " + st + (navigator.onLine ? "" : " off");
+    el.title = syncTitle();
+  }
+  if (st === "err" && prev !== "err") toast("Nube: " + msg, "err");
+}
+const syncTitle = () => !navigator.onLine ? "Sin conexión · los cambios se guardan en el equipo y se suben al volver la señal" : Cloud.status === "sync" ? "Guardando en la nube…" : Cloud.status === "err" ? "Hubo un error al guardar. Revisá tu conexión o permisos." : "Todo guardado en la nube";
+window.addEventListener("online", () => {
+  setSync(Cloud.status);
+  toast("Conexión recuperada: sincronizando");
+  cloudSchedule();
+});
+window.addEventListener("offline", () => {
+  setSync(Cloud.status);
+  toast("Sin conexión: seguís trabajando y se sube al volver la señal", "warn");
+});
+function leaderLoop() {
+  const { fs } = Cloud.fb;
+  const ref = fs.doc(Cloud.db, "svb_meta", "leader");
+  const tick = async () => {
+    try {
+      const s = await fs.getDoc(ref);
+      const d = s.exists() ? s.data() : null;
+      const mine = !d || d.device === Cloud.device || Date.now() - (d.beat || 0) > 15e4;
+      if (mine) await fs.setDoc(ref, { device: Cloud.device, beat: Date.now(), by: Cloud.email });
+      if (mine !== Cloud.leader) {
+        Cloud.leader = mine;
+        if (mine) startMonitor();
+      }
+    } catch (e) {
+      console.warn("líder", e.message);
+    }
+  };
+  tick();
+  clearInterval(Cloud.leaderTimer);
+  Cloud.leaderTimer = setInterval(tick, 6e4);
+}
+let samplesLastPush = 0;
+function pushSamples() {
+  if (!Cloud.ready || !Cloud.leader || Date.now() - samplesLastPush < 115e3) return;
+  samplesLastPush = Date.now();
+  const { fs } = Cloud.fb;
+  const data = {};
+  for (const [k, v] of Object.entries(S.samples)) data[k] = v.slice(-60);
+  fs.setDoc(fs.doc(Cloud.db, "svb_meta", "samples"), { data: JSON.parse(JSON.stringify(data)), at: Date.now() }).catch((e) => console.warn(e.message));
+}
+const CloudFiles = {
+  async put(key, blob, cid = null) {
+    if (!Cloud.ready) return;
+    const { fs } = Cloud.fb;
+    const b64 = await new Promise((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok(String(r.result).split(",")[1] || "");
+      r.onerror = () => ko(r.error);
+      r.readAsDataURL(blob);
+    });
+    const N = 7e5, parts = Math.ceil(b64.length / N) || 1;
+    for (let i = 0; i < parts; i++) await fs.setDoc(fs.doc(Cloud.db, "svb_files", `${key}__${i}`), { key, i, parts, type: blob.type || "application/pdf", data: b64.slice(i * N, (i + 1) * N), _cid: cid, at: Date.now() });
+  },
+  async get(key) {
+    if (!Cloud.ready) return null;
+    const { fs } = Cloud.fb;
+    const first = await fs.getDoc(fs.doc(Cloud.db, "svb_files", `${key}__0`));
+    if (!first.exists()) return null;
+    const f = first.data();
+    let b64 = f.data;
+    for (let i = 1; i < f.parts; i++) {
+      const p = await fs.getDoc(fs.doc(Cloud.db, "svb_files", `${key}__${i}`));
+      b64 += p.data().data;
+    }
+    const bin = atob(b64), arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: f.type });
+  }
+};
+function authMsg(e) {
+  const m = { "auth/invalid-credential": "Email o contraseña incorrectos", "auth/wrong-password": "Contraseña incorrecta", "auth/user-not-found": "No existe una cuenta con ese email", "auth/too-many-requests": "Demasiados intentos. Esperá unos minutos o restablecé la contraseña", "auth/email-already-in-use": "Ese email ya tiene cuenta: ingresá o restablecé la contraseña", "auth/weak-password": "La contraseña debe tener al menos 6 caracteres", "auth/invalid-email": "Email inválido", "auth/popup-closed-by-user": "Se cerró la ventana de Google antes de terminar", "auth/network-request-failed": "Sin conexión a internet", "auth/unauthorized-domain": "Este dominio no está autorizado en Firebase" };
+  return m[e == null ? void 0 : e.code] || (e == null ? void 0 : e.message) || String(e);
+}
+const CloudAuth = {
+  async google() {
+    const { auth } = Cloud.fb;
+    const p = new auth.GoogleAuthProvider();
+    p.setCustomParameters({ prompt: "select_account" });
+    try {
+      await auth.signInWithPopup(Cloud.auth, p);
+    } catch (e) {
+      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(e.code)) return auth.signInWithRedirect(Cloud.auth, p);
+      throw new Error(authMsg(e));
+    }
+  },
+  async email(email, pass) {
+    try {
+      await Cloud.fb.auth.signInWithEmailAndPassword(Cloud.auth, email.trim(), pass);
+    } catch (e) {
+      throw new Error(authMsg(e));
+    }
+  },
+  async signup(email, pass) {
+    try {
+      await Cloud.fb.auth.createUserWithEmailAndPassword(Cloud.auth, email.trim(), pass);
+    } catch (e) {
+      throw new Error(authMsg(e));
+    }
+  },
+  async reset(email) {
+    try {
+      await Cloud.fb.auth.sendPasswordResetEmail(Cloud.auth, email.trim());
+    } catch (e) {
+      throw new Error(authMsg(e));
+    }
+  },
+  async logout() {
+    var _a;
+    try {
+      audit("LOGOUT", "users", (_a = currentUser()) == null ? void 0 : _a.id, null, null);
+      await cloudPush();
+    } catch (e) {
+    }
+    await Cloud.fb.auth.signOut(Cloud.auth);
+    location.hash = "";
+  },
+  /* Crea la cuenta de acceso de otra persona sin cerrar la sesión actual (app secundaria) */
+  async createFor(email, pass) {
+    const { app, auth } = Cloud.fb;
+    const sec = app.getApps().find((a) => a.name === "alta") || app.initializeApp(FIREBASE_CONFIG, "alta");
+    const a2 = auth.getAuth(sec);
+    try {
+      await auth.createUserWithEmailAndPassword(a2, email.trim(), pass);
+      await auth.signOut(a2);
+      return true;
+    } catch (e) {
+      if (e.code === "auth/email-already-in-use") return false;
+      throw new Error(authMsg(e));
+    }
+  }
+};
 </script>
 <script>
 var __defProp = Object.defineProperty;
@@ -707,6 +1449,36 @@ function blankState({ company, cuit, ownerName, ownerEmail }) {
   s.seq = {};
   return s;
 }
+function realState({ ownerName, ownerEmail }) {
+  const s = blankState({ company: "Vincular Business", cuit: "", ownerName, ownerEmail });
+  s.settings.heartbeatSec = 60;
+  s.settings.simulate = false;
+  s.settings.channels = { whatsapp: "5493874484132", email: "vincularbusiness@gmail.com", instagram: "", facebook: "", telegram: "", web: "https://raveholding.github.io/SistemaIntegralSVB/", hours: "Lunes a viernes de 9 a 18 h · Sábados de 9 a 13 h", welcome: "¡Hola! Somos Vincular Business. Contanos en qué te ayudamos y te respondemos por acá." };
+  s.sites = [{ id: "site1", name: "Sitio corporativo", domain: "raveholding.github.io", provider: "GitHub Pages" }];
+  const at = nowISO();
+  const C = (id, o) => __spreadValues({ id, taxId: "", city: "Salta", status: "active", ownerId: "u1", createdAt: at }, o);
+  s.clients = [
+    C("c-medicinalterps", { legalName: "Terpenos Medicinales – Asociación Civil", tradeName: "Medicinal Terps", taxCondition: "Exento", email: "medicinalterps@gmail.com", phone: "", industry: "ONG · cannabis medicinal", web: "https://raveholding.github.io/Medicinal-Terps/", notes: "Sistema VB v3.5: sitio público + panel interno (PWA). Nube Supabase (São Paulo)." }),
+    C("c-cannabismatica", { legalName: "Fundación Cannabismatica Investigación y Desarrollo", tradeName: "Cannabismatica I+D", taxCondition: "Exento", email: "", phone: "", industry: "ONG · cannabis medicinal (Ley 27.350 · REPROCANN)", web: "https://raveholding.github.io/Cannabismatica/", notes: "Sistema VB ONG v3 con nube; portero digital integrado." }),
+    C("c-sebachavez", { legalName: "SebaChavez Car Service", tradeName: "SebaChavez Car Service", taxCondition: "Monotributo", email: "schavezcarservice@gmail.com", phone: "3875971922", industry: "Taller mecánico integral", address: "Jujuy 251, Salta", web: "https://raveholding.github.io/Sebachavezcarervice/", notes: "Órdenes de trabajo, turnos, repuestos, caja. Instagram sebachavez_carservice · Facebook sebachavezcarservice." }),
+    C("c-almacenrave", { legalName: "RAVE Holding", tradeName: "Almacén RAVE", taxCondition: "RI", email: "raveholding@gmail.com", phone: "", industry: "Almacén · bebidas y tabaco", web: "https://raveholding.github.io/AlmacenRAVE/", notes: "Sistema VB 26F: POS, stock, caja, Club RAVE, reparto, canales de atención y portero SeguridadRave." }),
+    C("c-clinicapc", { legalName: "Clínica de la PC", tradeName: "Clínica de la PC", taxCondition: "Monotributo", email: "", phone: "", industry: "Servicio técnico de computadoras", web: "https://raveholding.github.io/Clinicadelapc/", notes: "Sistema de taller (versión de prueba en el negocio, datos en el navegador)." })
+  ];
+  const R = (id, clientId, name, publicName, kind, endpoint, region = "github-pages") => ({ id, clientId, name, publicName, kind, endpoint, region, base: { cpu: 10, mem: 20, lat: 150 }, status: "unknown", statusSince: at, lastBeat: null, active: true, paused: false, stress: false, missedBeats: 3, uptimeDownMs: 0, check: "http" });
+  s.resources = [
+    R("r-svb", null, "sistema-integral-svb", "Sistema Integral SVB", "website", "https://raveholding.github.io/SistemaIntegralSVB/"),
+    R("r-mt-web", "c-medicinalterps", "medicinalterps-web", "Sitio y panel", "website", "https://raveholding.github.io/Medicinal-Terps/"),
+    R("r-mt-db", "c-medicinalterps", "medicinalterps-supabase", "Base de datos en la nube", "supabase_project", "https://yhxeznyqkfmczpkjwgep.supabase.co", "sa-east-1"),
+    R("r-cm-web", "c-cannabismatica", "cannabismatica-web", "Sitio y panel", "website", "https://raveholding.github.io/Cannabismatica/"),
+    R("r-cm-portero", "c-cannabismatica", "cannabismatica-portero", "Portero digital", "website", "https://raveholding.github.io/PorteroCannabismatica/"),
+    R("r-sc-web", "c-sebachavez", "sebachavez-web", "Sistema del taller", "website", "https://raveholding.github.io/Sebachavezcarervice/"),
+    R("r-ar-web", "c-almacenrave", "almacenrave-web", "Menú digital y sistema", "website", "https://raveholding.github.io/AlmacenRAVE/"),
+    R("r-ar-portero", "c-almacenrave", "almacenrave-portero", "Seguridad y portero", "website", "https://raveholding.github.io/SeguridadRave/"),
+    R("r-cp-web", "c-clinicapc", "clinicapc-web", "Sistema de taller", "website", "https://raveholding.github.io/Clinicadelapc/")
+  ];
+  s.interactions = s.clients.map((c) => ({ id: uid(), clientId: c.id, userId: "u1", kind: "note", subject: "Alta en Sistema Integral SVB", body: "Cliente cargado al iniciar el sistema en la nube.", at }));
+  return s;
+}
 function loadState() {
   const REQUIRED = ["users", "clients", "plans", "subscriptions", "contracts", "contractVersions", "resources", "alerts", "alertRules", "sessions", "documents", "movements", "employees", "goals", "commissions", "pages", "leads", "tickets", "ticketMessages", "notifications", "audit", "interactions", "subChanges", "registers", "schemes", "sites", "pageVersions", "deployments"];
   let raw = null;
@@ -778,7 +1550,7 @@ const clientName = (id) => {
 };
 const userName = (id) => {
   var _a, _b;
-  return (_b = (_a = db.get("users", id)) == null ? void 0 : _a.name) != null ? _b : "—";
+  return (_b = (_a = db.get("users", id)) == null ? void 0 : _a.name) != null ? _b : id && isPortalUser() ? "Equipo de soporte" : "—";
 };
 const planOf = (sub) => sub ? db.get("plans", sub.planId) : null;
 const subPrice = (sub) => {
@@ -786,9 +1558,18 @@ const subPrice = (sub) => {
   return sub ? (_c = (_b = sub.priceOverride) != null ? _b : (_a = planOf(sub)) == null ? void 0 : _a.price) != null ? _c : 0 : 0;
 };
 const activeSub = (clientId) => S.subscriptions.find((s) => s.clientId === clientId && s.status !== "canceled");
+function strHash(t) {
+  let h1 = 2166136261, h2 = 5381;
+  for (let i = 0; i < t.length; i++) {
+    const c = t.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 16777619);
+    h2 = Math.imul(h2, 33) + c | 0;
+  }
+  return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36);
+}
 function notify({ kind, title, body = "", link = "", dedupe = null, severity = "info", telegram = false }) {
   if (dedupe && S.notifications.some((n2) => n2.dedupe === dedupe)) return null;
-  const n = { id: uid(), kind, title, body, link, dedupe, severity, at: nowISO(), read: false };
+  const n = { id: dedupe ? "n_" + strHash(dedupe) : uid(), kind, title, body, link, dedupe, severity, at: nowISO(), read: false };
   S.notifications.unshift(n);
   S.notifications = S.notifications.slice(0, 200);
   save();
@@ -1426,17 +2207,75 @@ function uptime30(r) {
   return clamp(r2(100 - down / span * 100), 0, 100);
 }
 let monitorTimer = null;
+const isHttpRes = (r) => /^https?:\/\//i.test(r.endpoint || "");
+async function checkHttp(url) {
+  const ctl = window.AbortController ? new AbortController() : null;
+  const t0 = performance.now();
+  const to = setTimeout(() => ctl && ctl.abort(), 12e3);
+  try {
+    await fetch(url + (url.includes("?") ? "&" : "?") + "svbcheck=" + Date.now(), { mode: "no-cors", cache: "no-store", signal: ctl == null ? void 0 : ctl.signal, redirect: "follow" });
+    return { ok: true, lat: Math.round(performance.now() - t0) };
+  } catch (e) {
+    return { ok: false, error: e.name === "AbortError" ? "Sin respuesta en 12 s" : "No responde" };
+  } finally {
+    clearTimeout(to);
+  }
+}
+async function realCheck(r) {
+  var _a, _b;
+  const res = await checkHttp(r.endpoint);
+  if (!db.get("resources", r.id)) return;
+  const ts = nowISO();
+  if (res.ok) {
+    r.fails = 0;
+    r.lastBeat = ts;
+    S.samples[r.id] = [...(_a = S.samples[r.id]) != null ? _a : [], { ts, cpu: null, mem: null, lat: res.lat }].slice(-MAX_SAMPLES);
+    resolveAlerts("hb:" + r.id);
+    let status = "operational";
+    for (const rule of S.alertRules.filter((x) => x.active && x.metric === "lat")) {
+      const fp = `rule:${rule.id}:${r.id}`;
+      if (breaches(rule, S.samples[r.id])) {
+        status = rule.severity === "critical" ? "down" : "degraded";
+        openAlert(r, fp, rule.severity, `${r.name}: latencia ${rule.op} ${rule.threshold} ms`, `Respuesta en ${res.lat} ms durante ${rule.samples} chequeos`, res.lat, rule.id);
+      } else resolveAlerts(fp);
+    }
+    if (r.status !== "maintenance" && r.status !== status) db.update("resources", r.id, (() => {
+      var _a2;
+      const o = { status, statusSince: ts };
+      if (r.status === "down") o.uptimeDownMs = ((_a2 = r.uptimeDownMs) != null ? _a2 : 0) + (Date.now() - new Date(r.statusSince).getTime());
+      return o;
+    })(), { silent: true });
+  } else {
+    r.fails = ((_b = r.fails) != null ? _b : 0) + 1;
+    if (r.fails >= 2 && r.status !== "down" && r.status !== "maintenance") {
+      db.update("resources", r.id, { status: "down", statusSince: ts }, { silent: true });
+      openAlert(r, "hb:" + r.id, "critical", `${r.name}: no responde`, `${res.error} · ${r.endpoint}`);
+    }
+  }
+}
 function startMonitor() {
   clearInterval(monitorTimer);
+  const cloud = typeof Cloud !== "undefined" && Cloud.on;
   const tick = () => {
-    if (!S.settings.simulate) return;
-    for (const r of S.resources.filter((r3) => r3.active && !r3.paused && r3.status !== "maintenance")) heartbeat(r);
-    watchdog();
-    save();
-    rerenderIf(["dashboard", "monitor", "portal"], true);
+    if (cloud && (!Cloud.ready || !Cloud.leader)) {
+      rerenderIf(["dashboard", "monitor", "portal"], true);
+      return;
+    }
+    const act = S.resources.filter((r) => r.active && r.status !== "maintenance");
+    if (S.settings.simulate) {
+      for (const r of act.filter((r3) => !r3.paused && !isHttpRes(r3))) heartbeat(r);
+      watchdog();
+      save();
+    }
+    Promise.all(act.filter(isHttpRes).map((r) => realCheck(r).catch(() => {
+    }))).then(() => {
+      save();
+      if (cloud) pushSamples();
+      rerenderIf(["dashboard", "monitor", "portal"], true);
+    });
   };
   tick();
-  monitorTimer = setInterval(tick, S.settings.heartbeatSec * 1e3);
+  monitorTimer = setInterval(tick, Math.max(S.settings.simulate ? 2 : 30, S.settings.heartbeatSec || 60) * 1e3);
 }
 </script>
 <script>
@@ -1467,7 +2306,15 @@ const ICON_PATHS = {
   unlock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
   send: '<path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/>',
-  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  install: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>',
+  cloud: '<path d="M17.5 19H8a6 6 0 1 1 5.7-7.9A4.5 4.5 0 1 1 17.5 19z"/>',
+  wa: '<path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8c-1-.4-1.9-1.3-2.3-2.3l.8-1-1-2z"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>',
+  cmd: '<path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 0 0 0-6z"/>'
 };
 const icon = (n, cls = "") => {
   var _a;
@@ -1553,6 +2400,7 @@ const ROUTES = [
   { id: "caja", label: "Caja y POS", ic: "pos", perm: "pos.operate" },
   { id: "rrhh", label: "Equipo", ic: "hr", perm: "hr.read" },
   { id: "cms", label: "Web y CMS", ic: "cms", perm: "cms.read" },
+  { id: "atencion", label: "Atención al público", ic: "chat", perm: "inbox.manage" },
   { id: "soporte", label: "Soporte", ic: "tickets", perm: "tickets.read" },
   { id: "auditoria", label: "Auditoría", ic: "audit", perm: "audit.read" },
   { id: "ajustes", label: "Ajustes", ic: "settings", perm: "settings.manage" }
@@ -1577,9 +2425,15 @@ function rerenderIf(routes, soft = false) {
 }
 function render() {
   const root = $("#root");
+  if (route() === "contacto") {
+    root.innerHTML = viewPublicChat();
+    afterRender();
+    return;
+  }
   const u = currentUser();
   if (!u) {
-    root.innerHTML = viewLogin();
+    root.innerHTML = typeof Cloud !== "undefined" && Cloud.on ? viewCloudGate() : viewLogin();
+    afterRender();
     return;
   }
   if (isPortalUser(u)) {
@@ -1590,10 +2444,10 @@ function render() {
   let r = route();
   const def = ROUTES.find((x) => x.id === r);
   if (!def || def.perm && !can(def.perm)) r = "dashboard";
-  const views = { dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, auditoria: viewAudit, ajustes: viewSettings };
+  const views = { dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, atencion: viewInbox, auditoria: viewAudit, ajustes: viewSettings };
   const k = kpis();
   const nav = ROUTES.filter((x) => !x.perm || can(x.perm)).map((x) => {
-    const badge = x.id === "monitor" ? k.openAlerts : x.id === "soporte" ? k.openTickets : 0;
+    const badge = x.id === "monitor" ? k.openAlerts : x.id === "soporte" ? k.openTickets : x.id === "atencion" ? inboxUnread() : 0;
     return `<a href="#/${x.id}" class="${x.id === r ? "active" : ""}">${icon(x.ic)}<span>${x.label}</span>${badge ? `<span class="badge" data-badge="${x.id}">${badge}</span>` : ""}</a>`;
   }).join("");
   const unread = S.notifications.filter((n) => !n.read).length;
@@ -1611,10 +2465,14 @@ function render() {
         <button class="iconbtn menu-toggle" data-act="menu">${icon("menu")}</button>
         <div class="search">${icon("search")}<input id="gsearch" placeholder="Buscar clientes, contratos, comprobantes…" value="${esc(UI.search)}" autocomplete="off"></div>
         <div class="top-right">
+          ${cloudBadge()}
+          <button class="iconbtn" data-act="palette" title="Ir a… (Ctrl+K)">${icon("cmd")}</button>
+          <button class="iconbtn" data-act="theme" title="Tema claro / oscuro">${icon(themeIsLight() ? "moon" : "sun")}</button>
+          ${installBtn()}
           <button class="iconbtn" data-act="notif" aria-label="Notificaciones">${icon("bell")}${unread ? '<span class="dot"></span>' : ""}</button>
           <div class="who"><b>${esc(u.name)}</b><span>${ROLES[u.role]}</span></div>
           <div class="avatar">${esc(u.name[0])}</div>
-          <button class="iconbtn" data-act="logout" title="Cambiar de usuario">${icon("logout")}</button>
+          <button class="iconbtn" data-act="logout" title="Cerrar sesión">${icon("logout")}</button>
         </div>
       </header>
       <main class="content" id="view" data-route="${r}">${UI.search ? viewSearch() : views[r]()}</main>
@@ -1631,6 +2489,7 @@ function updateBadges() {
   };
   set("monitor", k.openAlerts);
   set("soporte", k.openTickets);
+  set("atencion", inboxUnread());
 }
 const afterHooks = [];
 function afterRender() {
@@ -1753,6 +2612,8 @@ function viewMonitor() {
   if (sel) UI.monitorRes = sel.id;
   const k = kpis(), manage = can("monitor.manage");
   const samples = sel ? (_c = S.samples[sel.id]) != null ? _c : [] : [];
+  const realOnly = !samples.length || samples[samples.length - 1].cpu == null;
+  if (realOnly) UI.monitorMetric = "lat";
   const m = UI.monitorMetric, last = samples[samples.length - 1];
   const TH = { cpu: [75, 90, "%", 100, "#7C8CFF"], mem: [75, 85, "%", 100, "#38BDF8"], lat: [800, 1500, "ms", null, "#22E39B"] }[m];
   const lv = last == null ? void 0 : last[m];
@@ -1763,8 +2624,8 @@ function viewMonitor() {
   return ph(
     "Módulo 1",
     "Monitor de salud e infraestructura",
-    "Telemetría de servidores y bases Supabase/PostgreSQL de cada cliente corporativo.",
-    `<span class="live"><i></i>Heartbeat cada ${S.settings.heartbeatSec} s</span>${manage ? btn("Reglas", "rules", { ic: "settings" }) + btn("Nuevo recurso", "res-new", { tone: "primary", ic: "plus" }) : ""}`
+    "Disponibilidad y latencia real de los sitios, sistemas y bases de cada cliente, con alertas.",
+    `<span class="live"><i></i>${S.settings.simulate ? "Simulación" : "Chequeo real"} cada ${S.settings.heartbeatSec} s${typeof Cloud !== "undefined" && Cloud.ready ? Cloud.leader ? " · este equipo monitorea" : " · monitorea otro equipo" : ""}</span>${manage ? btn("Reglas", "rules", { ic: "settings" }) + btn("Nuevo recurso", "res-new", { tone: "primary", ic: "plus" }) : ""}`
   ) + `<div class="grid g4 mb">${["operational", "degraded", "down", "maintenance"].map((s) => {
     var _a2;
     return `<div class="card row" style="padding:14px 18px">${sdot(HEALTH[s][0], s === "down" && k.resCount[s])}<span class="muted">${HEALTH[s][1]}</span><b class="num" style="margin-left:auto;font-size:20px">${(_a2 = k.resCount[s]) != null ? _a2 : 0}</b></div>`;
@@ -1773,10 +2634,10 @@ function viewMonitor() {
     ${card(
     sel ? esc(sel.name) : "Sin recursos",
     `<div class="card-b">
-        <div class="row between mb"><div class="tabs">${Object.entries(METRIC_LABEL).map(([key, l]) => `<button data-act="metric" data-id="${key}" class="${key === m ? "on" : ""}">${l}</button>`).join("")}</div>
+        <div class="row between mb"><div class="tabs">${Object.entries(METRIC_LABEL).filter(([key]) => !realOnly || key === "lat").map(([key, l]) => `<button data-act="metric" data-id="${key}" class="${key === m ? "on" : ""}">${l}</button>`).join("")}</div>
         <div class="num t-${lvTone}" style="font-size:24px;font-weight:650">${lv != null ? lv : "—"}<span class="small subtle"> ${TH[2]}</span></div></div>
         <canvas id="chart" class="chart"></canvas></div>`,
-    { cls: "span2", sub: sel ? `${esc(sel.clientId ? clientName(sel.clientId) : "Interno")} · ${esc(sel.region)} · último latido ${fmt.rel(sel.lastBeat)}` : "", action: sel ? `<div class="row wrap" style="justify-content:flex-end">${manage ? btn(sel.paused ? "Restaurar heartbeat" : "Cortar heartbeat", "res-pause", { sm: true, tone: sel.paused ? "success" : "ghost", data: { id: sel.id } }) + btn(sel.stress ? "Normalizar" : "Estrés", "res-stress", { sm: true, tone: sel.stress ? "danger" : "ghost", data: { id: sel.id } }) + btn(sel.status === "maintenance" ? "Fin mantenimiento" : "Mantenimiento", "res-maint", { sm: true, tone: "ghost", data: { id: sel.id } }) : ""}${mapPill(HEALTH, sel.status)}</div>` : "" }
+    { cls: "span2", sub: sel ? `${esc(sel.clientId ? clientName(sel.clientId) : "Interno")} · ${esc(sel.region)} · ${esc(sel.endpoint || "")} · último chequeo ${fmt.rel(sel.lastBeat)}` : "", action: sel ? `<div class="row wrap" style="justify-content:flex-end">${manage ? (S.settings.simulate && !isHttpRes(sel) ? btn(sel.paused ? "Restaurar heartbeat" : "Cortar heartbeat", "res-pause", { sm: true, tone: sel.paused ? "success" : "ghost", data: { id: sel.id } }) + btn(sel.stress ? "Normalizar" : "Estrés", "res-stress", { sm: true, tone: sel.stress ? "danger" : "ghost", data: { id: sel.id } }) : "") + (isHttpRes(sel) ? `<a class="btn sm ghost" href="${esc(sel.endpoint)}" target="_blank" rel="noopener">Abrir</a>` : "") + btn("Editar", "res-edit", { sm: true, tone: "ghost", data: { id: sel.id } }) + btn(sel.status === "maintenance" ? "Fin mantenimiento" : "Mantenimiento", "res-maint", { sm: true, tone: "ghost", data: { id: sel.id } }) : ""}${mapPill(HEALTH, sel.status)}</div>` : "" }
   )}
     ${card(
     "Registro de alertas",
@@ -1792,14 +2653,14 @@ function viewMonitor() {
     var _a2, _b2, _c2;
     const s = ((_a2 = S.samples[r.id]) != null ? _a2 : []).slice(-1)[0];
     const live = s && !r.paused && r.status !== "maintenance";
-    const b = (v, w, c) => live ? `<div style="min-width:80px">${bar(v, v > c ? "crit" : v > w ? "warn" : "ok")}<span class="xs num">${v.toFixed(0)} %</span></div>` : "—";
+    const b = (v, w, c) => live && v != null ? `<div style="min-width:80px">${bar(v, v > c ? "crit" : v > w ? "warn" : "ok")}<span class="xs num">${v.toFixed(0)} %</span></div>` : "—";
     return `<tr class="${r.id === (sel == null ? void 0 : sel.id) ? "sel" : ""}"><td><a href="#/monitor?r=${r.id}" class="t">${esc(r.name)}</a><div class="s" style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.endpoint)}">${esc(r.kind)} · ${esc(r.endpoint)}</div></td>
       <td>${esc(r.clientId ? clientName(r.clientId) : "Interno")}</td><td>${mapPill(HEALTH, r.status)}</td>
-      <td>${b((_b2 = s == null ? void 0 : s.cpu) != null ? _b2 : 0, 75, 90)}</td><td>${b((_c2 = s == null ? void 0 : s.mem) != null ? _c2 : 0, 75, 85)}</td>
+      <td>${b((_b2 = s == null ? void 0 : s.cpu) != null ? _b2 : null, 75, 90)}</td><td>${b((_c2 = s == null ? void 0 : s.mem) != null ? _c2 : null, 75, 85)}</td>
       <td class="num ${live && s.lat > 1500 ? "t-crit" : live && s.lat > 800 ? "t-warn" : ""}">${live ? s.lat + " ms" : "—"}</td>
       <td class="num">${uptime30(r).toFixed(2).replace(".", ",")} %</td><td class="xs">${fmt.rel(r.lastBeat)}</td>
       </td></tr>`;
-  })), { cls: "mt", sub: "Elegí un recurso para ver su gráfico. Simulación en el panel: «Cortar heartbeat» o «Estrés» para probar reglas y avisos" })}`;
+  })), { cls: "mt", sub: "Elegí un recurso para ver su gráfico. Los sitios y APIs (https://…) se chequean de verdad; CPU y memoria requieren el agente instalado en el servidor." })}`;
 }
 function viewDocs() {
   const list = [...S.contracts].sort((a, b) => {
@@ -1893,8 +2754,11 @@ function clientForm(c = {}) {
     ${field("Teléfono / WhatsApp", `<input class="in" name="phone" value="${esc(c.phone)}">`)}
     ${field("Ciudad", `<input class="in" name="city" value="${esc((_a = c.city) != null ? _a : "Salta")}">`)}
     ${field("Rubro", `<input class="in" name="industry" value="${esc(c.industry)}">`)}
+    ${field("Dirección", `<input class="in" name="address" value="${esc(c.address)}">`)}
+    ${field("Sitio / sistema (URL)", `<input class="in" name="web" type="url" placeholder="https://…" value="${esc(c.web)}">`)}
     ${field("Estado", `<select class="in" name="status">${opts(Object.entries(CLIENT_STATUS).map(([k, v]) => [k, v[1]]), (_b = c.status) != null ? _b : "lead")}</select>`)}
     ${field("Responsable", `<select class="in" name="ownerId">${opts(S.users.filter((u) => STAFF_ROLES.includes(u.role) && u.active).map((u) => [u.id, u.name]), (_c = c.ownerId) != null ? _c : currentUser().id)}</select>`)}
+    ${field("Notas", `<textarea class="in" name="notes" rows="2">${esc(c.notes)}</textarea>`, "", "full")}
   </div>`;
 }
 function clientModal(id) {
@@ -1905,7 +2769,11 @@ function clientModal(id) {
   openModal(esc(c.tradeName || c.legalName), `
     <div class="row between mb">${mapPill(CLIENT_STATUS, c.status)}<div class="row">${can("crm.write") ? btn("Editar datos", "client-edit", { sm: true, data: { id } }) : ""}</div></div>
     <div class="fgrid small muted mb"><div>Razón social<div style="color:var(--fg)">${esc(c.legalName)}</div></div><div>CUIT / IVA<div style="color:var(--fg)">${esc(c.taxId || "—")} · ${esc(c.taxCondition)}</div></div>
-      <div style="margin-top:10px">Contacto<div style="color:var(--fg)">${esc(c.email || "—")} · ${esc(c.phone || "—")}</div></div><div style="margin-top:10px">Responsable<div style="color:var(--fg)">${esc(userName(c.ownerId))}</div></div></div>
+      <div style="margin-top:10px">Contacto<div style="color:var(--fg)">${esc(c.email || "—")} · ${esc(c.phone || "—")}</div></div><div style="margin-top:10px">Responsable<div style="color:var(--fg)">${esc(userName(c.ownerId))}</div></div>
+      ${c.address ? `<div style="margin-top:10px">Dirección<div style="color:var(--fg)">${esc(c.address)}</div></div>` : ""}
+      ${c.web ? `<div style="margin-top:10px">Sistema / sitio<div><a href="${esc(c.web)}" target="_blank" rel="noopener">${esc(c.web.replace(/^https?:\/\//, ""))}</a></div></div>` : ""}
+      ${c.phone ? `<div style="margin-top:10px">WhatsApp<div><a target="_blank" rel="noopener" href="https://wa.me/549${esc(c.phone.replace(/\D/g, "").replace(/^0/, ""))}">Escribir por WhatsApp</a></div></div>` : ""}
+      ${c.notes ? `<div class="full" style="margin-top:10px;grid-column:1/-1">Notas<div style="color:var(--fg)">${esc(c.notes)}</div></div>` : ""}</div>
     <div class="card" style="padding:16px;margin-bottom:16px"><div class="row between"><div><div class="eyebrow">Suscripción</div>
       ${s ? `<b>${esc(p.name)}</b> · ${fmt.money(subPrice(s))}/mes <span class="xs subtle">desde ${fmt.date(s.startedAt)}</span>` : '<span class="subtle">Sin suscripción activa</span>'}</div>
       <div class="row">${can("billing.manage") ? s ? `<select class="in" id="cm-plan" style="width:auto;height:30px">${opts(S.plans.filter((x) => x.active && x.id !== p.id).map((x) => [x.id, `${x.name} · ${fmt.money(x.price)}`]))}</select>${btn("Cambiar plan", "cm-change", { sm: true, tone: "primary", data: { id: s.id } })}${btn("Baja", "cm-cancel", { sm: true, tone: "danger", data: { id: s.id } })}` : `<select class="in" id="cm-plan" style="width:auto;height:30px">${opts(S.plans.filter((x) => x.active).map((x) => [x.id, `${x.name} · ${fmt.money(x.price)}`]))}</select>${btn("Dar de alta", "cm-create", { sm: true, tone: "success", data: { id } })}` : ""}</div></div>
@@ -2126,11 +2994,11 @@ function viewCms() {
      <td class="right nowrap">${btn("Vista previa", "page-preview", { sm: true, tone: "ghost", ic: "eye", data: { id: p.id } })}${can("cms.write") ? btn("Editar", "page-edit", { sm: true, tone: "ghost", data: { id: p.id } }) : ""}${can("cms.publish") && (p.status !== "published" || p.dirty) ? btn("Publicar", "page-publish", { sm: true, tone: "success", data: { id: p.id } }) : ""}</td></tr>`))) + `<div class="grid g2 mt">
     ${card("Despliegues", table(["Commit", "Estado", "Duración", "Por", "Cuándo"], deps.map((d) => `<tr><td class="mono xs t">${d.commit}</td><td>${mapPill(DEPLOY_STATUS, d.status)}</td><td class="num">${d.durationMs ? (d.durationMs / 1e3).toFixed(1) + " s" : "—"}</td><td class="xs">${esc(userName(d.by))}</td><td class="xs">${fmt.rel(d.at)}</td></tr>`)))}
     ${card("Leads captados", table(["Contacto", "Origen", "Estado", ""], [...S.leads].sort((a, b) => b.at.localeCompare(a.at)).map((l) => {
-    var _a, _b;
-    return `<tr><td><div class="t">${esc(l.name)}</div><div class="s">${esc(l.company || l.email || l.phone)} · ${fmt.rel(l.at)}</div></td><td class="xs">${esc((_b = (_a = db.get("pages", l.pageId)) == null ? void 0 : _a.title) != null ? _b : "—")}</td>
+    var _a;
+    return `<tr><td><div class="t">${esc(l.name)}</div><div class="s">${esc(l.company || l.email || l.phone)} · ${fmt.rel(l.at)}</div></td><td class="xs">${esc(l.source || ((_a = db.get("pages", l.pageId)) == null ? void 0 : _a.title) || "—")}</td>
        <td>${can("crm.write") && l.status !== "converted" ? `<select class="in" style="height:30px;width:auto" data-act-change="lead-status" data-id="${l.id}">${opts(Object.entries(LEAD_STATUS).filter(([k]) => k !== "converted").map(([k, v]) => [k, v[1]]), l.status)}</select>` : mapPill(LEAD_STATUS, l.status)}</td>
        <td class="right">${can("crm.write") && l.status !== "converted" ? btn("A CRM", "lead-convert", { sm: true, data: { id: l.id } }) : ""}</td></tr>`;
-  })), { sub: "Formularios de landing → CRM" })}
+  })), { sub: "Formularios de landing y atención al público → CRM" })}
   </div>`;
 }
 function landingHtml(p, interactive = true) {
@@ -2236,8 +3104,8 @@ function viewSettings() {
   return ph("Configuración", "Ajustes", "Empresa, usuarios y excepciones de permisos, notificaciones por Telegram y respaldo de datos.") + `<div class="grid g2">
     ${card("Empresa y monitoreo", `<div class="card-b"><div class="fgrid">
       ${field("Nombre", `<input class="in" id="st-company" value="${esc(st.company)}">`)}${field("CUIT", `<input class="in" id="st-cuit" value="${esc(st.cuit)}">`)}
-      ${field("Intervalo de heartbeat (s)", `<input class="in" id="st-hb" type="number" min="2" max="60" value="${st.heartbeatSec}">`)}
-      <label class="row small muted" style="margin-top:22px"><input type="checkbox" id="st-sim" ${st.simulate ? "checked" : ""}> Simular telemetría (sin agentes reales)</label></div>
+      ${field("Intervalo de chequeo (s)", `<input class="in" id="st-hb" type="number" min="30" max="900" value="${st.heartbeatSec}">`, "Cada cuánto se revisa cada sitio o sistema (30 a 900 s).")}
+      <label class="row small muted" style="margin-top:22px"><input type="checkbox" id="st-sim" ${st.simulate ? "checked" : ""}> Simular CPU/memoria en recursos sin URL (sólo pruebas)</label></div>
       ${btn("Guardar", "st-save", { tone: "primary", sm: true })}</div>`)}
     ${card("Alertas por Telegram", `<div class="card-b">
       ${field("Token del bot", `<input class="in mono" id="tg-token" type="password" value="${esc(tg.token)}" placeholder="123456:ABC…">`, "Crealo con @BotFather. Se guarda sólo en este navegador.")}
@@ -2256,16 +3124,15 @@ function viewSettings() {
   ) + card("Respaldo de datos", `<div class="card-b row wrap">
     ${btn("Exportar respaldo (JSON)", "data-export", { ic: "download" })}
     <label class="btn outline">${icon("upload")}Importar respaldo<input type="file" id="data-import" accept="application/json" hidden></label>
-    ${btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" })}
-    ${btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
-    <p class="xs subtle" style="flex-basis:100%">Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF.</p></div>`, { cls: "mt" });
+    ${typeof Cloud !== "undefined" && Cloud.on ? "" : btn("Empezar con mis datos (borrar demo)", "data-fresh", { tone: "danger" }) + btn("Restablecer datos de demostración", "data-reset", { tone: "danger" })}
+    <p class="xs subtle" style="flex-basis:100%">${typeof Cloud !== "undefined" && Cloud.on ? "Los datos viven en la nube (Firebase · Firestore, São Paulo) y se sincronizan en tiempo real entre todos los equipos. Sin señal se sigue trabajando y se sube al volver la conexión. Igual conviene exportar un respaldo JSON cada tanto." : "Los datos viven en este navegador (localStorage + IndexedDB para los PDF). Exportá un respaldo periódicamente. El respaldo JSON no incluye los PDF."}</p></div>`, { cls: "mt" });
 }
 function userForm(u = {}) {
   var _a;
   return `<div class="fgrid">${field("Nombre *", `<input class="in" name="name" value="${esc(u.name)}">`)}${field("Email *", `<input class="in" name="email" type="email" value="${esc(u.email)}">`)}
     ${field("Rol", `<select class="in" name="role">${opts(Object.entries(ROLES), (_a = u.role) != null ? _a : "employee")}</select>`)}
     ${field("Empresa (sólo roles cliente)", `<select class="in" name="clientId">${opts([["", "—"], ...S.clients.map((c) => [c.id, c.tradeName || c.legalName])], u.clientId)}</select>`)}
-    ${field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
+    ${typeof Cloud !== "undefined" && Cloud.on ? field("Contraseña inicial (opcional)", `<input class="in" name="initPass" type="password" autocomplete="new-password" minlength="6" placeholder="Mín. 6 caracteres">`, "Crea su acceso con email y contraseña. Si usa Gmail también puede entrar con «Continuar con Google» sin contraseña.") : field(u.pinHash ? "PIN de ingreso (dejar vacío para mantener)" : "PIN de ingreso (opcional)", `<input class="in" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="4 a 8 dígitos">`, u.pinHash ? `<label class="small muted"><input type="checkbox" name="pinClear"> Quitar PIN</label>` : "Si lo cargás, se pide al ingresar con este perfil.")}
     <label class="row small muted full"><input type="checkbox" name="active" ${u.active !== false ? "checked" : ""}> Usuario activo</label></div>
     ${u.id && STAFF_ROLES.includes(u.role) ? `<div class="eyebrow" style="margin:16px 0 8px">Excepciones de permisos (sobre el rol)</div>
       <div class="tw card"><table><tbody>${PERMS.map(([p, d]) => {
@@ -2359,6 +3226,11 @@ const val = (id) => {
   var _a, _b;
   return (_b = (_a = $("#" + id)) == null ? void 0 : _a.value) != null ? _b : "";
 };
+function cloudInitPass(email, pass) {
+  if (!pass || typeof Cloud === "undefined" || !Cloud.on) return;
+  if (pass.length < 6) return toast("La contraseña inicial debe tener al menos 6 caracteres", "err");
+  CloudAuth.createFor(email, pass).then((created) => toast(created ? `Acceso creado para ${email}` : `${email} ya tenía cuenta: puede usar «Olvidé mi contraseña»`, created ? "ok" : "warn")).catch((e) => toast(e.message, "err"));
+}
 const pinHash = (userId, pin) => SHA.hex("svb-pin|" + userId + "|" + String(pin != null ? pin : ""));
 function doLogin(id) {
   S.session.userId = id;
@@ -2830,9 +3702,10 @@ Diferencia ${fmt.money(r2(cnt - exp), true)}`, { title: "Cerrar caja", ok: "Cerr
   /* ajustes */
   "st-save": () => run(() => {
     need("settings.manage");
-    const hb = clamp(Number(val("st-hb")) || 3, 2, 60);
+    const sim = $("#st-sim").checked;
+    const hb = clamp(Number(val("st-hb")) || 60, sim ? 2 : 30, 900);
     const old = __spreadValues({}, S.settings);
-    Object.assign(S.settings, { company: val("st-company").trim() || "Mi empresa", cuit: val("st-cuit").trim(), heartbeatSec: hb, simulate: $("#st-sim").checked });
+    Object.assign(S.settings, { company: val("st-company").trim() || "Mi empresa", cuit: val("st-cuit").trim(), heartbeatSec: hb, simulate: sim });
     audit("UPDATE", "settings", "general", { company: old.company, heartbeatSec: old.heartbeatSec }, { company: S.settings.company, heartbeatSec: hb });
     save();
     startMonitor();
@@ -2863,7 +3736,8 @@ Diferencia ${fmt.money(r2(cnt - exp), true)}`, { title: "Cerrar caja", ok: "Cerr
     if (d.pin) {
       db.update("users", nu.id, { pinHash: pinHash(nu.id, d.pin) });
     }
-    return "Usuario creado: ya puede ingresar";
+    cloudInitPass(nu.email, d.initPass);
+    return Cloud.on ? `Usuario creado: ya puede ingresar con ${nu.email}` : "Usuario creado: ya puede ingresar";
   } }),
   "user-edit": (el) => {
     const u = db.get("users", el.dataset.id);
@@ -2876,6 +3750,7 @@ Diferencia ${fmt.money(r2(cnt - exp), true)}`, { title: "Cerrar caja", ok: "Cerr
       saveUser({ name: d.name.trim(), email: d.email.trim(), role: d.role, clientId: d.clientId || null, active: !!d.active, overrides: STAFF_ROLES.includes(d.role) ? ov : {} }, u.id);
       if (d.pinClear) db.update("users", u.id, { pinHash: null });
       else if (d.pin) db.update("users", u.id, { pinHash: pinHash(u.id, d.pin) });
+      cloudInitPass(d.email.trim(), d.initPass);
       return "Usuario actualizado";
     } });
   },
@@ -3022,32 +3897,703 @@ window.addEventListener("resize", () => {
   if (route() === "monitor" && !isPortalUser()) rerenderIf(["monitor"], true);
 });
 window.addEventListener("storage", (e) => {
-  if (e.key === APP_KEY && e.newValue) {
+  if (!(typeof Cloud !== "undefined" && Cloud.on) && e.key === APP_KEY && e.newValue) {
     S = JSON.parse(e.newValue);
     render();
   }
 });
-try {
-  loadState();
+document.addEventListener("DOMContentLoaded", () => {
   try {
-    processExpirations();
+    if (typeof Cloud !== "undefined" && Cloud.on) {
+      S = emptyState();
+      render();
+      window.__svbStarted = true;
+      cloudBoot();
+      setInterval(() => {
+        if (Cloud.ready && Cloud.leader) {
+          try {
+            processExpirations();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }, 60 * 60 * 1e3);
+    } else {
+      loadState();
+      try {
+        processExpirations();
+      } catch (e) {
+        console.error(e);
+      }
+      startMonitor();
+      setInterval(() => {
+        try {
+          processExpirations();
+        } catch (e) {
+          console.error(e);
+        }
+      }, 60 * 60 * 1e3);
+      render();
+      window.__svbStarted = true;
+    }
   } catch (e) {
     console.error(e);
+    window.__svbShowError && window.__svbShowError(e.message || e);
   }
-  startMonitor();
-  setInterval(() => {
-    try {
-      processExpirations();
-    } catch (e) {
-      console.error(e);
+});
+</script>
+<script>
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
     }
-  }, 60 * 60 * 1e3);
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+function applyTheme() {
+  let mode = "dark";
+  try {
+    mode = localStorage.getItem("svb_theme") || "dark";
+  } catch (e) {
+  }
+  const light = mode === "light" || mode === "system" && matchMedia("(prefers-color-scheme: light)").matches;
+  document.documentElement.dataset.theme = light ? "light" : "dark";
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = light ? "#F4F6FB" : "#07090D";
+}
+const themeIsLight = () => document.documentElement.dataset.theme === "light";
+applyTheme();
+let deferredInstall = null;
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstall = e;
+  $$(".install-slot").forEach((x) => x.innerHTML = installBtn(x.dataset.big === "1"));
+});
+window.addEventListener("appinstalled", () => {
+  deferredInstall = null;
+  toast("¡Sistema instalado! Lo encontrás en tu pantalla de inicio");
   render();
-  window.__svbStarted = true;
+});
+function installBtn(big = false) {
+  if (isStandalone()) return "";
+  return big ? `<button class="gbtn install-btn" data-act="install">${icon("install")} Instalar la app en este equipo</button>` : `<button class="iconbtn install-btn" data-act="install" title="Instalar la app">${icon("install")}</button>`;
+}
+async function doInstall() {
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    const r = await deferredInstall.userChoice.catch(() => null);
+    deferredInstall = null;
+    if ((r == null ? void 0 : r.outcome) === "accepted") toast("Instalando…");
+    return;
+  }
+  const ua = navigator.userAgent, ios = /iphone|ipad|ipod/i.test(ua) || /Macintosh/.test(ua) && "ontouchend" in document;
+  openModal("Instalar Sistema Integral SVB", `<p class="small muted mb">Queda como una app más: ícono propio, pantalla completa y acceso directo.</p>
+    <ol class="small" style="line-height:1.9;padding-left:18px">${ios ? `<li>Abrí esta página en <b>Safari</b>.</li><li>Tocá el botón <b>Compartir</b> (cuadrado con flecha ↑).</li><li>Elegí <b>«Agregar a inicio»</b> y confirmá.</li>` : /android/i.test(ua) ? `<li>Abrí esta página en <b>Chrome</b>.</li><li>Tocá el menú <b>⋮</b> arriba a la derecha.</li><li>Elegí <b>«Instalar app»</b> o <b>«Agregar a la pantalla principal»</b>.</li>` : `<li>Abrí esta página en <b>Chrome</b> o <b>Edge</b>.</li><li>Hacé clic en el ícono de <b>instalar</b> (monitor con flecha) a la derecha de la barra de direcciones, o en el menú <b>⋮ → Transmitir, guardar y compartir → Instalar página como app</b>.</li><li>Confirmá con <b>Instalar</b>.</li>`}</ol>`, { footer: "" });
+}
+if ("serviceWorker" in navigator && location.protocol === "https:") window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW", e.message)));
+function cloudBadge() {
+  if (typeof Cloud === "undefined" || !Cloud.on) return "";
+  const st = Cloud.status === "idle" ? "ok" : Cloud.status;
+  return `<span id="sync-ind" class="sync ${st}${navigator.onLine ? "" : " off"}" title="${esc(syncTitle())}"><i></i>${icon("cloud")}<b>${navigator.onLine ? st === "sync" ? "Guardando" : st === "err" ? "Error" : "En la nube" : "Sin señal"}</b></span>`;
+}
+const GATE = { mode: "login", busy: false, email: "" };
+const DEV_LINE = () => `<div class="xs subtle center" style="margin-top:14px;text-align:center">Desarrollado por ${DEV.name} · WhatsApp ${DEV.wa} · ${DEV.email}</div>`;
+const G_ICON = `<svg viewBox="0 0 48 48" width="18" height="18"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
+function viewCloudGate() {
+  const head = (t, s) => `<div class="gate-logo">VB</div><h1>${t}</h1><p class="small muted">${s}</p>`;
+  const help = `<a class="fab" href="#/contacto">${icon("chat")} Atención al público</a>`;
+  if (Cloud.phase === "boot" || Cloud.phase === "loading") return `<div class="gate"><div class="gate-card" style="text-align:center"><div class="gate-logo" style="margin:0 auto 16px">VB</div><div class="spin"></div><b>${Cloud.phase === "boot" ? "Conectando con la nube…" : "Cargando tus datos…"}</b><p class="xs subtle" style="margin-top:6px">Sistema Integral SVB · Vincular Business</p></div></div>`;
+  if (Cloud.phase === "error") return `<div class="gate"><div class="gate-card">${head("No pudimos conectar", esc(Cloud.error || "Error desconocido"))}<div style="margin-top:18px">${btn("Reintentar", "reload", { tone: "primary" })}</div>${DEV_LINE()}</div></div>${help}`;
+  if (Cloud.phase === "pending") return `<div class="gate"><div class="gate-card">${head("Acceso pendiente", `La cuenta <b>${esc(Cloud.email)}</b> todavía no tiene acceso al sistema.`)}
+    <p class="small muted" style="margin-top:14px">${esc(Cloud.error || "Pedile al administrador que te dé de alta en Ajustes → Usuarios con este mismo email. Después volvé a ingresar.")}</p>
+    <div class="gate-foot">${btn("Reintentar", "reload", { tone: "primary" })}${btn("Ingresar con otra cuenta", "logout")}</div>${DEV_LINE()}</div></div>${help}`;
+  const m = GATE.mode;
+  return `<div class="gate"><div class="gate-card">
+    ${head(m === "signup" ? "Crear mi acceso" : m === "reset" ? "Restablecer contraseña" : "Sistema Integral SVB", m === "signup" ? "Usá el email con el que te dieron de alta." : m === "reset" ? "Te enviamos un enlace a tu email para elegir una nueva contraseña." : "Ingresá para gestionar clientes, sistemas, caja y soporte.")}
+    ${m === "login" ? `<div style="margin-top:20px"><button class="gbtn" data-act="g-login" ${GATE.busy ? "disabled" : ""}>${G_ICON} Continuar con Google</button></div><div class="or">o con tu email</div>` : '<div style="height:18px"></div>'}
+    <form id="gate-form" autocomplete="on">
+      <input class="in" name="email" type="email" placeholder="tu@email.com" autocomplete="username" required value="${esc(GATE.email)}">
+      ${m !== "reset" ? `<input class="in" name="pass" type="password" placeholder="${m === "signup" ? "Elegí una contraseña (mín. 6)" : "Contraseña"}" autocomplete="${m === "signup" ? "new-password" : "current-password"}" required minlength="6">` : ""}
+      <button class="btn primary" style="width:100%;height:44px" ${GATE.busy ? "disabled" : ""}>${GATE.busy ? "Un momento…" : m === "signup" ? "Crear acceso" : m === "reset" ? "Enviar enlace" : "Ingresar"}</button>
+    </form>
+    <div class="links">${m === "login" ? `<a data-act="gate-mode" data-id="reset">Olvidé mi contraseña</a><a data-act="gate-mode" data-id="signup">Primer ingreso: crear contraseña</a>` : `<a data-act="gate-mode" data-id="login">← Volver a ingresar</a>`}</div>
+    <div class="gate-foot"><span class="install-slot" data-big="1">${installBtn(true)}</span><a class="gbtn" href="#/contacto" style="text-decoration:none">${icon("chat")} ¿Necesitás ayuda? Escribinos</a></div>
+    ${DEV_LINE()}</div></div>`;
+}
+async function gateSubmit(f) {
+  const d = formData(f);
+  GATE.email = d.email || "";
+  GATE.busy = true;
+  render();
+  try {
+    if (GATE.mode === "reset") {
+      await CloudAuth.reset(d.email);
+      toast("Te enviamos el enlace. Revisá tu correo (y la carpeta de spam).");
+      GATE.mode = "login";
+    } else if (GATE.mode === "signup") {
+      await CloudAuth.signup(d.email, d.pass);
+      toast("Acceso creado");
+    } else await CloudAuth.email(d.email, d.pass);
+  } catch (e) {
+    toast(e.message, "err");
+  }
+  GATE.busy = false;
+  if (!currentUser()) render();
+}
+const PUB = { id: null, doc: null, unsub: null, meta: null, metaLoading: false, sending: false };
+try {
+  PUB.id = localStorage.getItem("svb_chat_id");
 } catch (e) {
-  console.error(e);
-  window.__svbShowError && window.__svbShowError(e.message || e);
+}
+const TOPICS = { sistema: "Quiero un sistema para mi negocio", soporte: "Soy cliente: necesito soporte", facturacion: "Facturación y pagos", otro: "Otra consulta" };
+const pubCh = () => {
+  var _a;
+  return ((_a = PUB.meta) == null ? void 0 : _a.channels) || {};
+};
+const waLink = (num, text = "") => `https://wa.me/${String(num || "").replace(/\D/g, "")}${text ? "?text=" + encodeURIComponent(text) : ""}`;
+function pubEnsure() {
+  if (!Cloud.db) {
+    window.addEventListener("fb-ready", () => setTimeout(() => route() === "contacto" && render(), 300), { once: true });
+    return false;
+  }
+  const { fs } = Cloud.fb;
+  if (!PUB.meta && !PUB.metaLoading) {
+    PUB.metaLoading = true;
+    fs.getDoc(fs.doc(Cloud.db, "svb_meta", "public")).then((s) => {
+      PUB.meta = s.exists() ? s.data() : { company: "Vincular Business", channels: {} };
+      render();
+    }).catch(() => {
+      PUB.meta = { company: "Vincular Business", channels: {} };
+      render();
+    });
+  }
+  if (PUB.id && !PUB.unsub) {
+    PUB.unsub = fs.onSnapshot(fs.doc(Cloud.db, "svb_inbox", PUB.id), (s) => {
+      var _a, _b;
+      if (!s.exists()) {
+        pubForget();
+        return render();
+      }
+      const prev = ((_b = (_a = PUB.doc) == null ? void 0 : _a.messages) == null ? void 0 : _b.length) || 0;
+      PUB.doc = s.data();
+      if (PUB.doc.unreadVisitor && route() === "contacto" && document.visibilityState === "visible") fs.updateDoc(s.ref, { unreadVisitor: false }).catch(() => {
+      });
+      if (route() === "contacto") {
+        const a = document.activeElement;
+        const typing = a && a.id === "pub-msg" && a.value;
+        if (!typing) render();
+        else pubRenderThread();
+        if (PUB.doc.messages.length > prev && prev && PUB.doc.lastFrom === "staff") beep();
+      }
+    }, () => {
+      pubForget();
+      render();
+    });
+  }
+  return true;
+}
+function pubForget() {
+  try {
+    localStorage.removeItem("svb_chat_id");
+  } catch (e) {
+  }
+  if (PUB.unsub) PUB.unsub();
+  PUB.unsub = null;
+  PUB.id = null;
+  PUB.doc = null;
+}
+const msgHtml = (m, mine) => `<div class="msg ${m.from === "sys" ? "sys" : m.from === mine ? "me" : "them"}">${esc(m.body)}<small>${m.from === "staff" ? esc(m.name || "Equipo") + " · " : ""}${new Date(m.at).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small></div>`;
+function pubRenderThread() {
+  const el = $("#pub-thread");
+  if (el && PUB.doc) {
+    el.innerHTML = PUB.doc.messages.map((m) => msgHtml(m, "visitor")).join("");
+    el.scrollTop = el.scrollHeight;
+  }
+}
+function viewPublicChat() {
+  const ok = pubEnsure();
+  const meta = PUB.meta, ch = pubCh(), company = (meta == null ? void 0 : meta.company) || "Vincular Business";
+  afterHooks.push(() => {
+    const el = $("#pub-thread");
+    if (el) el.scrollTop = el.scrollHeight;
+  });
+  const chans = [
+    ch.whatsapp && `<a class="chan wa" target="_blank" rel="noopener" href="${waLink(ch.whatsapp, "Hola " + company + ", quería hacer una consulta")}">${icon("wa")} WhatsApp</a>`,
+    ch.email && `<a class="chan mail" href="mailto:${esc(ch.email)}">${icon("mail")} Email</a>`,
+    ch.instagram && `<a class="chan ig" target="_blank" rel="noopener" href="https://instagram.com/${esc(String(ch.instagram).replace(/^@/, ""))}">${icon("spark")} Instagram</a>`,
+    ch.facebook && `<a class="chan fb" target="_blank" rel="noopener" href="https://facebook.com/${esc(ch.facebook)}">${icon("cms")} Facebook</a>`,
+    ch.telegram && `<a class="chan" target="_blank" rel="noopener" href="https://t.me/${esc(String(ch.telegram).replace(/^@/, ""))}">${icon("send")} Telegram</a>`
+  ].filter(Boolean).join("");
+  let body;
+  if (window.FB === null) body = `<div class="card" style="padding:28px;text-align:center"><b>No pudimos abrir el chat en este momento.</b><p class="small muted">Escribinos directamente:</p><div class="chans"><a class="chan wa" target="_blank" rel="noopener" href="${waLink("549" + DEV.wa.replace(/\D/g, ""), "Hola, quería hacer una consulta")}">${icon("wa")} WhatsApp</a><a class="chan mail" href="mailto:${DEV.email}">${icon("mail")} Email</a></div></div>`;
+  else if (!ok || !meta) body = `<div class="card" style="padding:40px;text-align:center"><div class="spin"></div>Cargando…</div>`;
+  else if (PUB.id && !PUB.doc) body = `<div class="card" style="padding:40px;text-align:center"><div class="spin"></div>Abriendo tu conversación…</div>`;
+  else if (PUB.doc) {
+    const d = PUB.doc;
+    body = `<div class="card"><div class="card-h row between" style="padding:14px 16px;border-bottom:1px solid var(--line)"><div><b>Tu consulta</b><div class="xs subtle">${esc(TOPICS[d.topic] || "Consulta")} · ${d.status === "resolved" ? "Resuelta" : "Te respondemos por acá y por tus datos de contacto"}</div></div>${btn("Nueva consulta", "pub-new", { sm: true, tone: "ghost" })}</div>
+      <div class="chat" id="pub-thread">${d.messages.map((m) => msgHtml(m, "visitor")).join("")}</div>
+      <form id="pub-reply" class="composer"><textarea class="in" id="pub-msg" name="body" rows="1" placeholder="Escribí tu mensaje…" maxlength="2000" required></textarea><button class="btn primary" ${PUB.sending ? "disabled" : ""}>${icon("send")}</button></form></div>`;
+  } else body = `<div class="card" style="padding:20px">
+      <p class="small muted" style="margin:0 0 14px">${esc(ch.welcome || "Contanos en qué te ayudamos y te respondemos a la brevedad.")}</p>
+      <form id="pub-form" class="fgrid">
+        ${field("Tu nombre *", `<input class="in" name="name" required maxlength="80" autocomplete="name">`)}
+        ${field("WhatsApp / teléfono", `<input class="in" name="phone" maxlength="40" inputmode="tel" autocomplete="tel" placeholder="387 …">`)}
+        ${field("Email", `<input class="in" name="email" type="email" maxlength="120" autocomplete="email">`)}
+        ${field("Tu negocio o empresa", `<input class="in" name="business" maxlength="100">`)}
+        ${field("Motivo", `<select class="in" name="topic">${opts(Object.entries(TOPICS))}</select>`, "", "full")}
+        ${field("Mensaje *", `<textarea class="in" name="body" rows="4" required maxlength="2000" placeholder="Contanos tu consulta"></textarea>`, "", "full")}
+        <div class="full row between wrap"><span class="xs subtle">Dejanos al menos un teléfono o email para responderte.</span><button class="btn primary" ${PUB.sending ? "disabled" : ""}>${icon("send")} ${PUB.sending ? "Enviando…" : "Enviar consulta"}</button></div>
+      </form></div>`;
+  return `<div class="pub"><div class="pub-wrap">
+    <div class="pub-head"><div class="gate-logo" style="margin:0">VB</div><div><div class="eyebrow">Atención al público</div><h1 style="margin:2px 0 0;font-size:22px">${esc(company)}</h1>${ch.hours ? `<div class="xs subtle">${esc(ch.hours)}</div>` : ""}</div>
+      <div style="margin-left:auto" class="row">${currentUser() ? `<a class="btn sm ghost" href="#/${isPortalUser() ? "" : "atencion"}">Volver al sistema</a>` : `<a class="btn sm ghost" href="#/">Ingresar</a>`}</div></div>
+    ${chans ? `<div class="chans">${chans}</div>` : ""}
+    ${body}
+    ${DEV_LINE()}</div></div>`;
+}
+async function pubCreate(f) {
+  const d = formData(f);
+  if (!d.name || d.name.trim().length < 2) return toast("Ingresá tu nombre", "err");
+  if (!d.phone && !d.email) return toast("Dejanos un teléfono o un email para responderte", "err");
+  if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return toast("Email inválido", "err");
+  if (!d.body || d.body.trim().length < 3) return toast("Escribí tu consulta", "err");
+  const { fs } = Cloud.fb;
+  const now = Date.now();
+  PUB.sending = true;
+  render();
+  try {
+    const ref = await fs.addDoc(fs.collection(Cloud.db, "svb_inbox"), {
+      name: d.name.trim(),
+      phone: (d.phone || "").trim(),
+      email: (d.email || "").trim().toLowerCase(),
+      business: (d.business || "").trim(),
+      topic: TOPICS[d.topic] ? d.topic : "otro",
+      status: "new",
+      channel: "web",
+      createdAt: now,
+      updatedAt: now,
+      lastFrom: "visitor",
+      unreadStaff: true,
+      unreadVisitor: false,
+      assignedTo: null,
+      messages: [{ from: "visitor", name: d.name.trim(), body: d.body.trim(), at: now }]
+    });
+    PUB.id = ref.id;
+    try {
+      localStorage.setItem("svb_chat_id", ref.id);
+    } catch (e) {
+    }
+    toast("¡Recibimos tu consulta! Te respondemos por acá.");
+  } catch (e) {
+    console.error(e);
+    toast("No se pudo enviar. Probá de nuevo o escribinos por WhatsApp.", "err");
+  }
+  PUB.sending = false;
+  render();
+}
+async function pubReply(f) {
+  const body = (formData(f).body || "").trim();
+  if (!body || !PUB.doc) return;
+  const { fs } = Cloud.fb;
+  const now = Date.now();
+  try {
+    await fs.updateDoc(fs.doc(Cloud.db, "svb_inbox", PUB.id), { messages: [...PUB.doc.messages, { from: "visitor", name: PUB.doc.name, body, at: now }], updatedAt: now, lastFrom: "visitor", unreadStaff: true });
+    const t = $("#pub-msg");
+    if (t) t.value = "";
+  } catch (e) {
+    toast("No se pudo enviar el mensaje", "err");
+  }
+}
+const INBOX = { list: [], loaded: false, sel: null, filter: "open", q: "", unsub: null, seen: /* @__PURE__ */ new Map() };
+const inboxUnread = () => INBOX.list.filter((c) => c.unreadStaff && c.status !== "resolved").length;
+function beep() {
+  try {
+    const a = new (window.AudioContext || window.webkitAudioContext)();
+    const o = a.createOscillator(), g = a.createGain();
+    o.connect(g);
+    g.connect(a.destination);
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.08, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(1e-4, a.currentTime + 0.35);
+    o.start();
+    o.stop(a.currentTime + 0.36);
+  } catch (e) {
+  }
+}
+function inboxListen() {
+  if (INBOX.unsub || !Cloud.ready || !can("inbox.manage")) return;
+  const { fs } = Cloud.fb;
+  INBOX.unsub = fs.onSnapshot(fs.query(fs.collection(Cloud.db, "svb_inbox"), fs.orderBy("updatedAt", "desc"), fs.limit(400)), (snap) => {
+    var _a, _b, _c, _d, _e;
+    const first = !INBOX.loaded;
+    INBOX.list = snap.docs.map((d) => __spreadValues({ id: d.id }, d.data()));
+    for (const c of INBOX.list) {
+      const n = ((_a = c.messages) == null ? void 0 : _a.length) || 0, prev = INBOX.seen.get(c.id);
+      if (!first && c.lastFrom === "visitor" && (prev === void 0 || n > prev)) {
+        beep();
+        toast(`💬 ${c.name}: ${String(((_b = c.messages[n - 1]) == null ? void 0 : _b.body) || "").slice(0, 70)}`);
+        notify({ kind: "inbox", title: `Atención al público · ${c.name}`, body: String(((_c = c.messages[n - 1]) == null ? void 0 : _c.body) || "").slice(0, 140), link: "#/atencion?c=" + c.id, dedupe: `inbox:${c.id}:${n}`, telegram: Cloud.leader });
+        try {
+          if (document.visibilityState !== "visible" && window.Notification && Notification.permission === "granted") new Notification("Nueva consulta · " + c.name, { body: String(((_d = c.messages[n - 1]) == null ? void 0 : _d.body) || "").slice(0, 120), icon: "icon-192.png", tag: c.id });
+        } catch (e) {
+        }
+      }
+      INBOX.seen.set(c.id, n);
+    }
+    INBOX.loaded = true;
+    Cloud.unsubs.push(() => {
+    });
+    updateBadges();
+    rerenderIf(["atencion"], route() === "atencion" && !!((_e = $("#ib-msg")) == null ? void 0 : _e.value));
+  }, (e) => console.warn("bandeja", e.message));
+  Cloud.unsubs.push(() => {
+    INBOX.unsub && INBOX.unsub();
+    INBOX.unsub = null;
+    INBOX.loaded = false;
+    INBOX.list = [];
+    INBOX.seen = /* @__PURE__ */ new Map();
+  });
+}
+const IB_ST = { new: ["info", "Nueva"], open: ["warn", "En curso"], resolved: ["ok", "Resuelta"] };
+function viewInbox() {
+  if (!INBOX.unsub) inboxListen();
+  const ch = S.settings.channels || {};
+  const want = routeParam("c");
+  if (want) INBOX.sel = want;
+  const q = INBOX.q.toLowerCase();
+  const list = INBOX.list.filter((c) => (INBOX.filter === "all" || (INBOX.filter === "open" ? c.status !== "resolved" : c.status === INBOX.filter)) && (!q || [c.name, c.phone, c.email, c.business].join(" ").toLowerCase().includes(q)));
+  const sel = INBOX.list.find((c) => c.id === INBOX.sel) || null;
+  if (sel && sel.unreadStaff) {
+    const { fs } = Cloud.fb;
+    fs.updateDoc(fs.doc(Cloud.db, "svb_inbox", sel.id), { unreadStaff: false }).catch(() => {
+    });
+  }
+  const link = location.origin + location.pathname + "#/contacto";
+  afterHooks.push(() => {
+    const t = $("#ib-thread");
+    if (t) t.scrollTop = t.scrollHeight;
+  });
+  const k = { new: INBOX.list.filter((c) => c.status === "new").length, open: INBOX.list.filter((c) => c.status === "open").length, today: INBOX.list.filter((c) => Date.now() - c.createdAt < 864e5).length, unread: inboxUnread() };
+  const quick = ["¡Hola! Gracias por escribirnos. ¿En qué te podemos ayudar?", "Ya lo estamos revisando, te aviso apenas esté.", "¿Te parece si coordinamos una llamada? Pasame un horario.", "¡Listo! Quedó resuelto. Cualquier cosa nos escribís."];
+  return ph(
+    "Canal de atención",
+    "Atención al público",
+    "Consultas que llegan desde la página pública, en tiempo real. Respondé desde acá, por WhatsApp o email, y convertilas en prospecto o ticket.",
+    `<button class="btn outline" data-act="ib-copy" data-id="${esc(link)}">${icon("send")} Copiar enlace público</button><a class="btn outline" href="#/contacto" target="_blank">${icon("eye")} Ver página pública</a>${btn("Canales", "ib-channels", { ic: "settings", tone: "primary" })}`
+  ) + `<div class="grid g4 mb">${kpi("Sin leer", k.unread, "", k.unread ? "warn" : "ok")}${kpi("Nuevas", k.new)}${kpi("En curso", k.open)}${kpi("Últimas 24 h", k.today)}</div>
+  <div class="inbox">
+    <div class="card"><div style="padding:12px;border-bottom:1px solid var(--line)"><div class="tabs mb" style="margin-bottom:10px">${[["open", "Abiertas"], ["new", "Nuevas"], ["resolved", "Resueltas"], ["all", "Todas"]].map(([kk, l]) => `<button data-act="ib-filter" data-id="${kk}" class="${INBOX.filter === kk ? "on" : ""}">${l}</button>`).join("")}</div>
+      <input class="in" id="ib-q" placeholder="Buscar por nombre, teléfono, email…" value="${esc(INBOX.q)}" autocomplete="off"></div>
+      <div class="inbox-list">${!INBOX.loaded ? `<div class="empty" style="padding:30px;text-align:center"><div class="spin"></div></div>` : list.length ? list.map((c) => {
+    var _a, _b;
+    return `<a class="conv ${c.id === INBOX.sel ? "on" : ""} ${c.unreadStaff && c.status !== "resolved" ? "unread" : ""}" data-act="ib-open" data-id="${c.id}">
+        <div class="n"><span>${esc(c.name)}${c.business ? ` <span class="xs subtle">· ${esc(c.business)}</span>` : ""}</span></div>
+        <div class="p">${c.lastFrom === "staff" ? "Vos: " : ""}${esc(((_b = (_a = c.messages) == null ? void 0 : _a[c.messages.length - 1]) == null ? void 0 : _b.body) || "")}</div>
+        <div class="row between" style="margin-top:6px">${mapPill(IB_ST, c.status)}<span class="xs subtle">${fmt.rel(new Date(c.updatedAt).toISOString())}</span></div></a>`;
+  }).join("") : `<div class="empty" style="padding:30px;text-align:center">Sin consultas${INBOX.filter !== "all" ? " en este filtro" : ""}.<div class="xs subtle" style="margin-top:6px">Compartí el enlace público en tu WhatsApp, Instagram o sitio.</div></div>`}</div></div>
+    ${sel ? `<div class="card"><div class="row between wrap" style="padding:14px 16px;border-bottom:1px solid var(--line);gap:10px">
+        <div><b>${esc(sel.name)}</b> ${mapPill(IB_ST, sel.status)}<div class="xs subtle">${esc(TOPICS[sel.topic] || "Consulta")}${sel.business ? " · " + esc(sel.business) : ""} · ${sel.phone ? esc(sel.phone) + " · " : ""}${esc(sel.email || "")} · desde ${fmt.dt(new Date(sel.createdAt).toISOString())}</div></div>
+        <div class="row wrap">${sel.phone ? `<a class="btn sm outline" target="_blank" rel="noopener" href="${waLink(sel.phone.replace(/^0/, "").startsWith("54") ? sel.phone : "549" + sel.phone.replace(/\D/g, "").replace(/^0/, ""), "Hola " + sel.name + ", te escribimos de " + S.settings.company + " por tu consulta.")}">${icon("wa")} WhatsApp</a>` : ""}${sel.email ? `<a class="btn sm outline" href="mailto:${esc(sel.email)}?subject=${encodeURIComponent("Tu consulta a " + S.settings.company)}">${icon("mail")} Email</a>` : ""}
+          ${can("crm.write") ? btn("→ Prospecto", "ib-lead", { sm: true, data: { id: sel.id } }) : ""}${can("tickets.manage") ? btn("→ Ticket", "ib-ticket", { sm: true, data: { id: sel.id } }) : ""}
+          ${sel.status === "resolved" ? btn("Reabrir", "ib-status", { sm: true, data: { id: sel.id, st: "open" } }) : btn("Marcar resuelta", "ib-status", { sm: true, tone: "success", data: { id: sel.id, st: "resolved" } })}</div></div>
+      <div class="chat" id="ib-thread" style="max-height:calc(100vh - 420px)">${(sel.messages || []).map((m) => msgHtml(m, "staff")).join("")}</div>
+      <div class="row wrap" style="gap:6px;padding:0 12px">${quick.map((t, i) => `<button class="pill" style="cursor:pointer" data-act="ib-quick" data-id="${i}">${esc(t.slice(0, 34))}…</button>`).join("")}</div>
+      <form id="ib-reply" class="composer"><textarea class="in" id="ib-msg" name="body" rows="2" placeholder="Escribí la respuesta (Ctrl+Enter para enviar)" maxlength="2000"></textarea><button class="btn primary">${icon("send")} Enviar</button></form></div>` : `<div class="card" style="padding:40px;text-align:center"><div class="muted">Elegí una conversación de la lista.</div>
+        <div class="xs subtle" style="margin-top:10px">Enlace público para compartir:<br><span class="mono">${esc(link)}</span></div>
+        <img alt="Código QR del canal de atención" style="margin-top:16px;border-radius:12px;background:#fff;padding:8px" width="180" height="180" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&data=${encodeURIComponent(link)}">
+        <div class="xs subtle" style="margin-top:8px">Imprimilo para el mostrador o compartilo en redes.</div></div>`}
+  </div>`;
+}
+INBOX.quick = ["¡Hola! Gracias por escribirnos. ¿En qué te podemos ayudar?", "Ya lo estamos revisando, te aviso apenas esté.", "¿Te parece si coordinamos una llamada? Pasame un horario.", "¡Listo! Quedó resuelto. Cualquier cosa nos escribís."];
+async function inboxReply(id, body) {
+  need("inbox.manage");
+  const c = INBOX.list.find((x) => x.id === id);
+  if (!c) throw new Error("Conversación no encontrada");
+  body = (body || "").trim();
+  if (!body) throw new Error("Escribí un mensaje");
+  const { fs } = Cloud.fb;
+  const now = Date.now(), u = currentUser();
+  await fs.updateDoc(fs.doc(Cloud.db, "svb_inbox", id), { messages: [...c.messages || [], { from: "staff", name: u.name.split(" ")[0], body, at: now }], updatedAt: now, lastFrom: "staff", unreadVisitor: true, unreadStaff: false, status: "open", assignedTo: c.assignedTo || u.id });
+  audit("REPLY", "inbox", id, null, { chars: body.length });
+}
+async function inboxStatus(id, status) {
+  need("inbox.manage");
+  const { fs } = Cloud.fb;
+  const c = INBOX.list.find((x) => x.id === id);
+  const extra = status === "resolved" ? { messages: [...(c == null ? void 0 : c.messages) || [], { from: "sys", body: "Consulta marcada como resuelta por " + currentUser().name.split(" ")[0], at: Date.now() }] } : {};
+  await fs.updateDoc(fs.doc(Cloud.db, "svb_inbox", id), __spreadValues({ status, updatedAt: Date.now(), unreadStaff: false }, extra));
+  audit("UPDATE", "inbox", id, { status: c == null ? void 0 : c.status }, { status });
+}
+const PAL = { open: false, q: "", i: 0 };
+function palItems() {
+  const q = PAL.q.toLowerCase().trim(), out = [];
+  for (const r of ROUTES.filter((x) => !x.perm || can(x.perm))) out.push({ ic: r.ic, t: r.label, hint: "Ir", go: "#/" + r.id });
+  if (can("crm.read")) for (const c of S.clients) out.push({ ic: "crm", t: c.tradeName || c.legalName, hint: "Cliente", go: "#/crm", client: c.id });
+  out.push({ ic: "chat", t: "Página pública de atención", hint: "Abrir", go: "#/contacto" });
+  out.push({ ic: themeIsLight() ? "moon" : "sun", t: "Cambiar tema claro/oscuro", hint: "Acción", act: "theme" });
+  if (!isStandalone()) out.push({ ic: "install", t: "Instalar la app", hint: "Acción", act: "install" });
+  out.push({ ic: "logout", t: "Cerrar sesión", hint: "Acción", act: "logout" });
+  return (q ? out.filter((x) => x.t.toLowerCase().includes(q)) : out).slice(0, 12);
+}
+function palRender() {
+  let el = $("#pal-root");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "pal-root";
+    document.body.appendChild(el);
+  }
+  if (!PAL.open) {
+    el.innerHTML = "";
+    return;
+  }
+  const items = palItems();
+  PAL.i = Math.min(PAL.i, Math.max(0, items.length - 1));
+  const had = $("#pal-in");
+  el.innerHTML = `<div class="pal" data-act="pal-close"><div class="pal-box" onclick="event.stopPropagation()"><input id="pal-in" placeholder="Buscá una sección, un cliente o una acción…" value="${esc(PAL.q)}" autocomplete="off"><ul>${items.map((x, i) => `<li class="${i === PAL.i ? "on" : ""}" data-act="pal-go" data-id="${i}">${icon(x.ic)}${esc(x.t)}<span>${x.hint}</span></li>`).join("") || '<li class="subtle">Sin resultados</li>'}</ul></div></div>`;
+  const inp = $("#pal-in");
+  inp.focus();
+  inp.setSelectionRange(inp.value.length, inp.value.length);
+}
+function palGo(i) {
+  const x = palItems()[i];
+  if (!x) return;
+  PAL.open = false;
+  PAL.q = "";
+  palRender();
+  if (x.act) return A[x.act]();
+  if (x.client) {
+    location.hash = x.go;
+    setTimeout(() => clientModal(x.client), 80);
+  } else location.hash = x.go;
+}
+document.addEventListener("keydown", (ev) => {
+  var _a, _b;
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "k" && currentUser() && !isPortalUser()) {
+    ev.preventDefault();
+    PAL.open = !PAL.open;
+    PAL.i = 0;
+    palRender();
+    return;
+  }
+  if (PAL.open) {
+    if (ev.key === "Escape") {
+      PAL.open = false;
+      palRender();
+    } else if (ev.key === "ArrowDown") {
+      ev.preventDefault();
+      PAL.i++;
+      palRender();
+    } else if (ev.key === "ArrowUp") {
+      ev.preventDefault();
+      PAL.i = Math.max(0, PAL.i - 1);
+      palRender();
+    } else if (ev.key === "Enter") {
+      ev.preventDefault();
+      palGo(PAL.i);
+    }
+  }
+  if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey) && ev.target.id === "ib-msg") {
+    ev.preventDefault();
+    (_a = $("#ib-reply")) == null ? void 0 : _a.requestSubmit();
+  }
+  if (ev.key === "Enter" && !ev.shiftKey && ev.target.id === "pub-msg") {
+    ev.preventDefault();
+    (_b = $("#pub-reply")) == null ? void 0 : _b.requestSubmit();
+  }
+});
+document.addEventListener("input", (ev) => {
+  if (ev.target.id === "pal-in") {
+    PAL.q = ev.target.value;
+    PAL.i = 0;
+    palRender();
+  }
+  if (ev.target.id === "ib-q") {
+    clearTimeout(INBOX._t);
+    INBOX._t = setTimeout(() => {
+      INBOX.q = ev.target.value;
+      render();
+      const s = $("#ib-q");
+      if (s) {
+        s.focus();
+        s.setSelectionRange(s.value.length, s.value.length);
+      }
+    }, 250);
+  }
+});
+document.addEventListener("submit", (ev) => {
+  const f = ev.target;
+  if (f.id === "gate-form") gateSubmit(f);
+  else if (f.id === "pub-form") pubCreate(f);
+  else if (f.id === "pub-reply") pubReply(f);
+  else if (f.id === "ib-reply") {
+    const v = $("#ib-msg").value;
+    inboxReply(INBOX.sel, v).then(() => {
+      const t = $("#ib-msg");
+      if (t) t.value = "";
+    }).catch((e) => toast(e.message, "err"));
+  }
+});
+Object.assign(A, {
+  reload: () => location.reload(),
+  logout: () => {
+    if (Cloud.on) {
+      UI.notifOpen = false;
+      CloudAuth.logout().catch((e) => toast(e.message, "err"));
+    } else {
+      S.session.userId = null;
+      save();
+      render();
+    }
+  },
+  "g-login": () => {
+    GATE.busy = true;
+    render();
+    CloudAuth.google().catch((e) => toast(e.message, "err")).finally(() => {
+      GATE.busy = false;
+      if (!currentUser()) render();
+    });
+  },
+  "gate-mode": (el) => {
+    GATE.mode = el.dataset.id;
+    render();
+  },
+  install: () => doInstall(),
+  theme: () => {
+    const next = themeIsLight() ? "dark" : "light";
+    try {
+      localStorage.setItem("svb_theme", next);
+    } catch (e) {
+    }
+    applyTheme();
+    render();
+  },
+  palette: () => {
+    PAL.open = true;
+    PAL.i = 0;
+    palRender();
+  },
+  "pal-close": () => {
+    PAL.open = false;
+    palRender();
+  },
+  "pal-go": (el) => palGo(Number(el.dataset.id)),
+  "pub-new": async () => {
+    if (!await ask("Vas a empezar una consulta nueva. La anterior queda registrada.", { title: "Nueva consulta", ok: "Empezar" })) return;
+    pubForget();
+    render();
+  },
+  "ib-open": (el) => {
+    INBOX.sel = el.dataset.id;
+    if (routeParam("c")) history.replaceState(null, "", "#/atencion");
+    render();
+    if (window.Notification && Notification.permission === "default") Notification.requestPermission().catch(() => {
+    });
+  },
+  "ib-filter": (el) => {
+    INBOX.filter = el.dataset.id;
+    render();
+  },
+  "ib-quick": (el) => {
+    const t = $("#ib-msg");
+    if (t) {
+      t.value = INBOX.quick[Number(el.dataset.id)];
+      t.focus();
+    }
+  },
+  "ib-status": (el) => inboxStatus(el.dataset.id, el.dataset.st).then(() => toast(el.dataset.st === "resolved" ? "Consulta resuelta" : "Consulta reabierta")).catch((e) => toast(e.message, "err")),
+  "ib-copy": (el) => {
+    var _a;
+    const t = el.dataset.id;
+    (((_a = navigator.clipboard) == null ? void 0 : _a.writeText(t)) || Promise.reject()).then(() => toast("Enlace copiado: pegalo en WhatsApp, Instagram o tu web")).catch(() => ask("Copiá el enlace:", { input: true, value: t, title: "Enlace público" }));
+  },
+  "ib-lead": (el) => run(() => {
+    need("crm.write");
+    const c = INBOX.list.find((x) => x.id === el.dataset.id);
+    if (S.leads.some((l) => l.inboxId === c.id)) throw new Error("Esta consulta ya es un prospecto");
+    db.insert("leads", { pageId: null, inboxId: c.id, name: c.name, email: c.email, phone: c.phone, company: c.business, message: (c.messages || []).filter((m) => m.from === "visitor").map((m) => m.body).join("\n").slice(0, 1500), source: "Atención al público", status: "new", at: nowISO() });
+  }, "Prospecto creado en Web y CMS → Leads"),
+  "ib-ticket": (el) => {
+    const c = INBOX.list.find((x) => x.id === el.dataset.id);
+    const guess = S.clients.find((k) => c.email && k.email && k.email.toLowerCase() === c.email || c.business && (k.tradeName || k.legalName).toLowerCase().includes(c.business.toLowerCase()));
+    openModal(
+      "Crear ticket de soporte",
+      `<div class="fgrid">${field("Cliente *", `<select class="in" name="clientId">${opts(S.clients.map((k) => [k.id, k.tradeName || k.legalName]), guess == null ? void 0 : guess.id)}</select>`)}
+      ${field("Prioridad", `<select class="in" name="priority">${opts([["normal", "Normal"], ["high", "Alta"], ["urgent", "Urgente"], ["low", "Baja"]])}</select>`)}
+      ${field("Asunto *", `<input class="in" name="subject" value="${esc(TOPICS[c.topic] || "Consulta de atención al público")}">`, "", "full")}
+      ${field("Descripción *", `<textarea class="in" name="description" rows="4">${esc((c.messages || []).filter((m) => m.from === "visitor").map((m) => m.body).join("\n"))}</textarea>`, "", "full")}</div>`,
+      { submit: (f) => {
+        const d = formData(f);
+        const t = createTicket(__spreadProps(__spreadValues({}, d), { category: "general" }));
+        return `Ticket #${t.number} creado`;
+      } }
+    );
+  },
+  "ib-channels": () => {
+    const ch = S.settings.channels || {};
+    openModal(
+      "Canales de atención",
+      `<p class="small muted mb">Se muestran en la página pública y en los botones de contacto.</p><div class="fgrid">
+      ${field("WhatsApp (con código de país)", `<input class="in" name="whatsapp" value="${esc(ch.whatsapp)}" placeholder="5493874484132">`)}${field("Email", `<input class="in" name="email" type="email" value="${esc(ch.email)}">`)}
+      ${field("Instagram (usuario)", `<input class="in" name="instagram" value="${esc(ch.instagram)}" placeholder="vincularbusiness">`)}${field("Facebook (página)", `<input class="in" name="facebook" value="${esc(ch.facebook)}">`)}
+      ${field("Telegram (usuario)", `<input class="in" name="telegram" value="${esc(ch.telegram)}">`)}${field("Horario de atención", `<input class="in" name="hours" value="${esc(ch.hours)}">`)}
+      ${field("Mensaje de bienvenida", `<textarea class="in" name="welcome" rows="2">${esc(ch.welcome)}</textarea>`, "", "full")}</div>`,
+      { submit: (f) => {
+        need("inbox.manage");
+        const d = formData(f);
+        const old = S.settings.channels;
+        S.settings.channels = __spreadProps(__spreadValues(__spreadValues({}, ch), d), { whatsapp: (d.whatsapp || "").replace(/\D/g, "") });
+        audit("UPDATE", "settings", "channels", old, S.settings.channels);
+        save();
+        PUB.meta = null;
+        return "Canales guardados";
+      } }
+    );
+  },
+  "res-edit": (el) => {
+    const r = db.get("resources", el.dataset.id);
+    openModal(
+      "Editar recurso",
+      `<div class="fgrid">
+      ${field("Nombre técnico", `<input class="in" name="name" value="${esc(r.name)}">`)}${field("Nombre para el cliente", `<input class="in" name="publicName" value="${esc(r.publicName)}">`)}
+      ${field("Cliente", `<select class="in" name="clientId">${opts([["", "Interno"], ...S.clients.map((c) => [c.id, c.tradeName || c.legalName])], r.clientId || "")}</select>`)}${field("Región", `<input class="in" name="region" value="${esc(r.region)}">`)}
+      ${field("URL o host", `<input class="in" name="endpoint" value="${esc(r.endpoint)}">`, "Si empieza con https:// se chequea de verdad.", "full")}
+      <label class="row small muted full"><input type="checkbox" name="active" ${r.active ? "checked" : ""}> Monitorear este recurso</label></div>`,
+      { submit: (f) => {
+        need("monitor.manage");
+        const d = formData(f);
+        if (!/^[a-z0-9-]{3,}$/.test(d.name)) throw new Error("Nombre técnico: minúsculas, números y guiones");
+        db.update("resources", r.id, { name: d.name, publicName: d.publicName, clientId: d.clientId || null, region: d.region, endpoint: d.endpoint.trim(), active: !!d.active });
+        startMonitor();
+        return "Recurso actualizado";
+      } }
+    );
+  }
+});
+</script>
+<script type="module">
+/* Firebase (SDK modular desde el CDN oficial). Expone window.FB y avisa con el evento "fb-ready".
+   Este bloque NO se transpila (es un módulo ES nativo). */
+const V = "12.19.0", B = `https://www.gstatic.com/firebasejs/${V}/`;
+try {
+  const [app, auth, fs] = await Promise.all([import(B + "firebase-app.js"), import(B + "firebase-auth.js"), import(B + "firebase-firestore.js")]);
+  window.FB = { app, auth, fs, version: V };
+  window.dispatchEvent(new Event("fb-ready"));
+} catch (e) {
+  console.error("Firebase no cargó", e);
+  window.FB = null; window.FB_ERROR = e;
+  window.dispatchEvent(new Event("fb-ready"));
 }
 </script>
-</body>
-</html>

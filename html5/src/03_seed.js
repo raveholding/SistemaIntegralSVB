@@ -126,6 +126,38 @@ function blankState({ company, cuit, ownerName, ownerEmail }) {
   return s;
 }
 
+/* Estado inicial REAL (primera vez en la nube): Vincular Business con sus clientes actuales.
+   Sin datos inventados: CUIT, planes y contratos se completan desde el sistema. */
+function realState({ ownerName, ownerEmail }) {
+  const s = blankState({ company: "Vincular Business", cuit: "", ownerName, ownerEmail });
+  s.settings.heartbeatSec = 60; s.settings.simulate = false;
+  s.settings.channels = { whatsapp: "5493874484132", email: "vincularbusiness@gmail.com", instagram: "", facebook: "", telegram: "", web: "https://raveholding.github.io/SistemaIntegralSVB/", hours: "Lunes a viernes de 9 a 18 h · Sábados de 9 a 13 h", welcome: "¡Hola! Somos Vincular Business. Contanos en qué te ayudamos y te respondemos por acá." };
+  s.sites = [{ id: "site1", name: "Sitio corporativo", domain: "raveholding.github.io", provider: "GitHub Pages" }];
+  const at = nowISO();
+  const C = (id, o) => ({ id, taxId: "", city: "Salta", status: "active", ownerId: "u1", createdAt: at, ...o });
+  s.clients = [
+    C("c-medicinalterps", { legalName: "Terpenos Medicinales – Asociación Civil", tradeName: "Medicinal Terps", taxCondition: "Exento", email: "medicinalterps@gmail.com", phone: "", industry: "ONG · cannabis medicinal", web: "https://raveholding.github.io/Medicinal-Terps/", notes: "Sistema VB v3.5: sitio público + panel interno (PWA). Nube Supabase (São Paulo)." }),
+    C("c-cannabismatica", { legalName: "Fundación Cannabismatica Investigación y Desarrollo", tradeName: "Cannabismatica I+D", taxCondition: "Exento", email: "", phone: "", industry: "ONG · cannabis medicinal (Ley 27.350 · REPROCANN)", web: "https://raveholding.github.io/Cannabismatica/", notes: "Sistema VB ONG v3 con nube; portero digital integrado." }),
+    C("c-sebachavez", { legalName: "SebaChavez Car Service", tradeName: "SebaChavez Car Service", taxCondition: "Monotributo", email: "schavezcarservice@gmail.com", phone: "3875971922", industry: "Taller mecánico integral", address: "Jujuy 251, Salta", web: "https://raveholding.github.io/Sebachavezcarervice/", notes: "Órdenes de trabajo, turnos, repuestos, caja. Instagram sebachavez_carservice · Facebook sebachavezcarservice." }),
+    C("c-almacenrave", { legalName: "RAVE Holding", tradeName: "Almacén RAVE", taxCondition: "RI", email: "raveholding@gmail.com", phone: "", industry: "Almacén · bebidas y tabaco", web: "https://raveholding.github.io/AlmacenRAVE/", notes: "Sistema VB 26F: POS, stock, caja, Club RAVE, reparto, canales de atención y portero SeguridadRave." }),
+    C("c-clinicapc", { legalName: "Clínica de la PC", tradeName: "Clínica de la PC", taxCondition: "Monotributo", email: "", phone: "", industry: "Servicio técnico de computadoras", web: "https://raveholding.github.io/Clinicadelapc/", notes: "Sistema de taller (versión de prueba en el negocio, datos en el navegador)." }),
+  ];
+  const R = (id, clientId, name, publicName, kind, endpoint, region = "github-pages") => ({ id, clientId, name, publicName, kind, endpoint, region, base: { cpu: 10, mem: 20, lat: 150 }, status: "unknown", statusSince: at, lastBeat: null, active: true, paused: false, stress: false, missedBeats: 3, uptimeDownMs: 0, check: "http" });
+  s.resources = [
+    R("r-svb", null, "sistema-integral-svb", "Sistema Integral SVB", "website", "https://raveholding.github.io/SistemaIntegralSVB/"),
+    R("r-mt-web", "c-medicinalterps", "medicinalterps-web", "Sitio y panel", "website", "https://raveholding.github.io/Medicinal-Terps/"),
+    R("r-mt-db", "c-medicinalterps", "medicinalterps-supabase", "Base de datos en la nube", "supabase_project", "https://yhxeznyqkfmczpkjwgep.supabase.co", "sa-east-1"),
+    R("r-cm-web", "c-cannabismatica", "cannabismatica-web", "Sitio y panel", "website", "https://raveholding.github.io/Cannabismatica/"),
+    R("r-cm-portero", "c-cannabismatica", "cannabismatica-portero", "Portero digital", "website", "https://raveholding.github.io/PorteroCannabismatica/"),
+    R("r-sc-web", "c-sebachavez", "sebachavez-web", "Sistema del taller", "website", "https://raveholding.github.io/Sebachavezcarervice/"),
+    R("r-ar-web", "c-almacenrave", "almacenrave-web", "Menú digital y sistema", "website", "https://raveholding.github.io/AlmacenRAVE/"),
+    R("r-ar-portero", "c-almacenrave", "almacenrave-portero", "Seguridad y portero", "website", "https://raveholding.github.io/SeguridadRave/"),
+    R("r-cp-web", "c-clinicapc", "clinicapc-web", "Sistema de taller", "website", "https://raveholding.github.io/Clinicadelapc/"),
+  ];
+  s.interactions = s.clients.map((c) => ({ id: uid(), clientId: c.id, userId: "u1", kind: "note", subject: "Alta en Sistema Integral SVB", body: "Cliente cargado al iniciar el sistema en la nube.", at }));
+  return s;
+}
+
 function loadState() {
   const REQUIRED = ["users", "clients", "plans", "subscriptions", "contracts", "contractVersions", "resources", "alerts", "alertRules", "sessions", "documents", "movements", "employees", "goals", "commissions", "pages", "leads", "tickets", "ticketMessages", "notifications", "audit", "interactions", "subChanges", "registers", "schemes", "sites", "pageVersions", "deployments"];
   let raw = null;

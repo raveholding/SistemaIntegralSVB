@@ -56,7 +56,7 @@ function viewMonitor() {
   const realOnly = !samples.length || samples[samples.length - 1].cpu == null;
   if (realOnly) UI.monitorMetric = "lat";
   const m = UI.monitorMetric, last = samples[samples.length - 1];
-  const TH = { cpu: [75, 90, "%", 100, "#7C8CFF"], mem: [75, 85, "%", 100, "#38BDF8"], lat: [800, 1500, "ms", null, "#22E39B"] }[m];
+  const TH = { cpu: [75, 90, "%", 100, "#FF7A1A"], mem: [75, 85, "%", 100, "#38BDF8"], lat: [800, 1500, "ms", null, "#22E39B"] }[m];
   const lv = last?.[m]; const lvTone = lv == null ? "subtle" : lv >= TH[1] ? "crit" : lv >= TH[0] ? "warn" : "ok";
   afterHooks.push(() => drawChart($("#chart"), samples, { key: m, warn: TH[0], crit: TH[1], unit: TH[2], max: TH[3], color: TH[4] }));
   const alerts = [...S.alerts].sort((a, b) => b.openedAt.localeCompare(a.openedAt)).slice(0, 25);

@@ -146,7 +146,7 @@ function render() {
   const sameRoute = prevMain && prevMain.dataset.route === r;
   root.innerHTML = `<div class="app">
     <aside class="side" id="side">
-      <div class="logo"><div class="logo-mark">VB</div><div><b>Sistema Integral</b><span>${esc(S.settings.company)}</span></div></div>
+      <div class="logo"><div class="logo-mark">VB</div><div><b>Vincular Business</b><span>Sistema integral</span></div></div>
       <nav class="nav">${nav}</nav>
       <div class="side-foot">Desarrollado por ${DEV.name}<br>WhatsApp ${DEV.wa}<br>${DEV.email}</div>
     </aside>
@@ -180,7 +180,7 @@ const afterHooks = [];
 function afterRender() { while (afterHooks.length) { try { afterHooks.shift()(); } catch (e) { console.error(e); } } }
 
 /* Gráfico de líneas en canvas (sin librerías) */
-function drawChart(canvas, data, { key, warn, crit, unit, max, color = "#7C8CFF" }) {
+function drawChart(canvas, data, { key, warn, crit, unit, max, color = "#FF7A1A" }) {
   if (!canvas) return;
   const dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
   canvas.width = W * dpr; canvas.height = H * dpr;

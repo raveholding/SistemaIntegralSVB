@@ -27,7 +27,7 @@ function installBtn(big = false) {
 async function doInstall() {
   if (deferredInstall) { deferredInstall.prompt(); const r = await deferredInstall.userChoice.catch(() => null); deferredInstall = null; if (r?.outcome === "accepted") toast("Instalando…"); return; }
   const ua = navigator.userAgent, ios = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
-  openModal("Instalar Sistema Integral SVB", `<p class="small muted mb">Queda como una app más: ícono propio, pantalla completa y acceso directo.</p>
+  openModal("Instalar la app de Vincular Business", `<p class="small muted mb">Queda como una app más: ícono propio, pantalla completa y acceso directo.</p>
     <ol class="small" style="line-height:1.9;padding-left:18px">${ios
       ? `<li>Abrí esta página en <b>Safari</b>.</li><li>Tocá el botón <b>Compartir</b> (cuadrado con flecha ↑).</li><li>Elegí <b>«Agregar a inicio»</b> y confirmá.</li>`
       : /android/i.test(ua) ? `<li>Abrí esta página en <b>Chrome</b>.</li><li>Tocá el menú <b>⋮</b> arriba a la derecha.</li><li>Elegí <b>«Instalar app»</b> o <b>«Agregar a la pantalla principal»</b>.</li>`
@@ -56,7 +56,7 @@ function viewCloudGate() {
     <div class="gate-foot">${btn("Reintentar", "reload", { tone: "primary" })}${btn("Ingresar con otra cuenta", "logout")}</div>${DEV_LINE()}</div></div>${help}`;
   const m = GATE.mode;
   return `<div class="gate"><div class="gate-card">
-    ${head(m === "signup" ? "Crear mi acceso" : m === "reset" ? "Restablecer contraseña" : "Sistema Integral SVB", m === "signup" ? "Usá el email con el que te dieron de alta." : m === "reset" ? "Te enviamos un enlace a tu email para elegir una nueva contraseña." : "Ingresá para gestionar clientes, sistemas, caja y soporte.")}
+    ${head(m === "signup" ? "Crear mi acceso" : m === "reset" ? "Restablecer contraseña" : "Vincular Business", m === "signup" ? "Usá el email con el que te dieron de alta." : m === "reset" ? "Te enviamos un enlace a tu email para elegir una nueva contraseña." : "Portal de clientes, soporte y gestión. Ingresá con tu cuenta.")}
     ${m === "login" ? `<div style="margin-top:20px"><button class="gbtn" data-act="g-login" ${GATE.busy ? "disabled" : ""}>${G_ICON} Continuar con Google</button></div><div class="or">o con tu email</div>` : '<div style="height:18px"></div>'}
     <form id="gate-form" autocomplete="on">
       <input class="in" name="email" type="email" placeholder="tu@email.com" autocomplete="username" required value="${esc(GATE.email)}">

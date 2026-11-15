@@ -183,7 +183,7 @@ function clientModal(id) {
   const changes = s ? S.subChanges.filter((x) => x.subscriptionId === s.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : [];
   const docs = S.documents.filter((d) => d.clientId === id).slice(-5).reverse();
   openModal(esc(c.tradeName || c.legalName), `
-    <div class="row between mb">${mapPill(CLIENT_STATUS, c.status)}<div class="row">${can("crm.write") ? btn("Editar datos", "client-edit", { sm: true, data: { id } }) : ""}</div></div>
+    <div class="row between mb">${mapPill(CLIENT_STATUS, c.status)}<div class="row">${btn("Ficha", "client-ficha", { sm: true, data: { id } })}${btn("Contrato", "client-contrato", { sm: true, data: { id } })}${can("crm.write") ? btn("Editar datos", "client-edit", { sm: true, data: { id } }) : ""}</div></div>
     <div class="fgrid small muted mb"><div>Razón social<div style="color:var(--fg)">${esc(c.legalName)}</div></div><div>CUIT / IVA<div style="color:var(--fg)">${esc(c.taxId || "—")} · ${esc(c.taxCondition)}</div></div>
       <div style="margin-top:10px">Contacto<div style="color:var(--fg)">${esc(c.email || "—")} · ${esc(c.phone || "—")}</div></div><div style="margin-top:10px">Responsable<div style="color:var(--fg)">${esc(userName(c.ownerId))}</div></div>
       ${c.address ? `<div style="margin-top:10px">Dirección<div style="color:var(--fg)">${esc(c.address)}</div></div>` : ""}

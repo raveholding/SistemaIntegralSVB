@@ -276,6 +276,7 @@ function viewSettings() {
       <label class="row small muted mb"><input type="checkbox" id="tg-on" ${tg.enabled ? "checked" : ""}> Activar envío</label>
       <div class="row">${btn("Guardar", "tg-save", { tone: "primary", sm: true })}${btn("Enviar prueba", "tg-test", { sm: true })}</div></div>`)}
   </div>` +
+  card("Tarjetas de los dueños", `<p class="small muted" style="margin:0 0 12px">Tarjetas de presentación con la marca, listas para imprimir (85 × 55 mm, frente y dorso).</p>${btn("Ver e imprimir tarjetas", "owner-cards", { tone: "primary", sm: true })}`, { pad: true }) +
   card("Usuarios y accesos", table(["Usuario", "Rol", "Empresa", "Excepciones", "Estado", ""], S.users.map((u) => `<tr><td><div class="t">${esc(u.name)}</div><div class="s">${esc(u.email)}</div></td><td>${ROLES[u.role]}</td>
     <td>${u.clientId ? esc(clientName(u.clientId)) : '<span class="subtle">Interno</span>'}</td><td class="xs">${Object.entries(u.overrides ?? {}).map(([p, g]) => pill(g ? "ok" : "crit", (g ? "+" : "−") + p)).join(" ") || "—"}</td>
     <td>${u.active ? pill("ok", "Activo") : pill("", "Inactivo")}</td><td class="right">${btn("Editar", "user-edit", { sm: true, data: { id: u.id } })}</td></tr>`)),

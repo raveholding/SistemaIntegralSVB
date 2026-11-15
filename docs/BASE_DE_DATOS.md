@@ -11,6 +11,7 @@ Migraciones en `supabase/migrations/` (aplican en orden). Pruebas de integració
 | `…05_rls_policies` | RLS de todas las tablas, grants, Storage y Realtime |
 | `…06_rbac_catalog` | 21 permisos + matriz por rol |
 | `…07_auth_hook` | claims en el JWT, `my_permissions`, `audit_verify`, `dashboard_kpis` |
+| `…08_licenses` | licencias por paquete: candado por módulo en `tenants_with`, Pro + IA, seguimiento de mantenimiento |
 
 ## Diagrama entidad-relación (resumido)
 

@@ -132,10 +132,11 @@ function render() {
   if (isPortalUser(u)) { root.innerHTML = viewPortal(); afterRender(); return; }
   let r = route();
   const def = ROUTES.find((x) => x.id === r);
-  if (!def || (def.perm && !can(def.perm))) r = "dashboard";
-  const views = { dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, atencion: viewInbox, auditoria: viewAudit, ajustes: viewSettings };
+  if (r !== "plan" && (!def || (def.perm && !can(def.perm)))) r = r !== "plan" && def && def.perm && lockedByLicense(def.perm) ? "plan" : "dashboard";
+  const views = { plan: viewPlan, dashboard: viewDashboard, monitor: viewMonitor, documentos: viewDocs, crm: viewCrm, caja: viewCaja, rrhh: viewHr, cms: viewCms, soporte: viewSupport, atencion: viewInbox, auditoria: viewAudit, ajustes: viewSettings };
   const k = kpis();
-  const nav = ROUTES.filter((x) => !x.perm || can(x.perm)).map((x) => {
+  const nav = ROUTES.filter((x) => !x.perm || can(x.perm) || lockedByLicense(x.perm)).map((x) => {
+    if (x.perm && lockedByLicense(x.perm)) return `<a href="#/plan" aria-label="${esc(x.label)} (bloqueado: mejorar plan)" style="opacity:.6">${icon(x.ic)}<span>${x.label}</span>${icon("lock", "")}</a>`;
     const badge = x.id === "monitor" ? k.openAlerts : x.id === "soporte" ? k.openTickets : x.id === "atencion" ? inboxUnread() : 0;
     return `<a href="#/${x.id}" class="${x.id === r ? "active" : ""}">${icon(x.ic)}<span>${x.label}</span>${badge ? `<span class="badge" data-badge="${x.id}">${badge}</span>` : ""}</a>`;
   }).join("");

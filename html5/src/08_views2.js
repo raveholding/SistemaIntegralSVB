@@ -357,4 +357,21 @@ function viewNotifications() {
     <ul class="list">${ns.length ? ns.map((n) => `<li style="${n.read ? "opacity:.55" : ""}"><a href="${n.link || "#"}" data-act="notif-go" style="color:inherit;display:block"><div class="row">${mapPill(SEV, n.severity === "critical" ? "critical" : n.severity === "warning" ? "warning" : "info")}<span class="xs subtle" style="margin-left:auto">${fmt.rel(n.at)}</span></div>
       <div class="small" style="margin-top:6px;color:var(--fg)">${esc(n.title)}</div>${n.body ? `<div class="xs subtle">${esc(n.body)}</div>` : ""}</a></li>`).join("") : '<li class="empty">Sin notificaciones</li>'}</ul></div>`;
 }
+
+
+/* Mi plan: licencia vigente, módulos con candado y "Mejorar plan" */
+function viewPlan() {
+  const pk = LICENSE_PACKAGES[LICENSE.package];
+  const mods = ["cms", "crm", "pos", "docs", "hr", "monitor", "portal", "ai"];
+  const msg = encodeURIComponent(`Hola Vincular Business, quiero mejorar mi plan. Plan actual: ${pk ? pk.name : "sin licencia"}.`);
+  return ph("Licencia", "Mi plan", `Paquete actual: ${pk ? pk.name : "sin licencia"}${LICENSE.ai ? " · Pro + IA" : ""}`, "") + `
+    ${LICENSE.status === "follow_up" ? `<div class="card mb"><p class="small">Tu mantenimiento mensual está en seguimiento. El sistema sigue activo: el equipo de Vincular Business se va a comunicar para ayudarte a regularizarlo.</p></div>` : ""}
+    <div class="card mb"><h3>Módulos de tu licencia</h3><ul class="small" style="list-style:none;padding:0;display:grid;gap:8px">
+      ${mods.map((m) => `<li>${moduleOn(m) ? "✓" : icon("lock", "")} ${esc(MODULE_LABELS[m])}${moduleOn(m) ? "" : ' <span class="subtle">(bloqueado)</span>'}</li>`).join("")}
+    </ul></div>
+    <div class="card"><h3>Paquetes</h3><p class="small muted">Pago único + mantenimiento mensual de $ 50.000 (ARS)</p>
+      <ul class="small" style="list-style:none;padding:0;display:grid;gap:8px;margin:12px 0">
+      ${Object.entries(LICENSE_PACKAGES).map(([k, v]) => `<li><b>${esc(v.name)}</b> — $ ${v.price.toLocaleString("es-AR")}${k === LICENSE.package ? " " + pill("brand", "Actual") : ""}<br><span class="subtle">${v.modules.map((m) => esc(MODULE_LABELS[m])).join(" · ")}</span></li>`).join("")}</ul>
+      <a class="btn primary" href="https://wa.me/5493874484132?text=${msg}" target="_blank" rel="noopener noreferrer">Mejorar plan por WhatsApp</a></div>`;
+}
 </script>

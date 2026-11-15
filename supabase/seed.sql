@@ -29,6 +29,10 @@ insert into public.memberships (tenant_id, user_id, role, client_id) values
   ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000011', 'client_admin', 'c0000000-0000-0000-0000-00000000000b')
 on conflict do nothing;
 
+insert into public.tenant_licenses (tenant_id, package_code, ai_enabled) values
+  ('11111111-1111-1111-1111-111111111111', 'completo_app', true)
+on conflict do nothing;
+
 insert into public.plans (id, tenant_id, code, name, tier, price_monthly, includes_ai, features) values
   ('b1000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'ESENCIAL', 'Abono Esencial', 1, 50000, false,
    '["Sistema de gestión a medida","Hosting y backups","Soporte en horario comercial","Monitoreo 24/7"]'),

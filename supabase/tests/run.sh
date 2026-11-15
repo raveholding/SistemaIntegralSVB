@@ -9,4 +9,5 @@ $P -f tests/00_supabase_stub.sql
 for f in migrations/*.sql; do $P -f "$f" >/dev/null; done
 $P -f seed.sql
 $P -f tests/01_flows.sql
+$P -f tests/02_licenses.sql
 echo "✔ Todas las pruebas pasaron"

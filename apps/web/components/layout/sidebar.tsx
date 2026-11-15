@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Activity, BadgeDollarSign, FileText, Globe, LayoutDashboard, LifeBuoy, ScrollText, Users, Wallet,
+  Activity, BadgeDollarSign, FileText, Globe, LayoutDashboard, LifeBuoy, Lock, ScrollText, Users, Wallet,
 } from "lucide-react";
 import { cn } from "@/components/ui/cn";
 
-export interface NavItem { href: string; label: string; icon: keyof typeof ICONS; perm: string; badge?: number }
+export interface NavItem { href: string; label: string; icon: keyof typeof ICONS; perm: string; badge?: number; locked?: boolean }
 
 const ICONS = {
   dashboard: LayoutDashboard, monitor: Activity, docs: FileText, crm: BadgeDollarSign, pos: Wallet,
@@ -28,6 +28,16 @@ export function Sidebar({ items, tenant }: { items: NavItem[]; tenant: string })
         {items.map((it) => {
           const Icon = ICONS[it.icon];
           const active = it.href === "/" ? path === "/" : path.startsWith(it.href);
+          if (it.locked) {
+            return (
+              <Link key={it.href} href="/plan" aria-label={`${it.label} (bloqueado: mejorar plan)`}
+                className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-fg-subtle transition hover:bg-white/[0.03]">
+                <Icon className="h-4 w-4 opacity-50" />
+                <span className="flex-1 opacity-60">{it.label}</span>
+                <Lock className="h-3.5 w-3.5 text-brand" />
+              </Link>
+            );
+          }
           return (
             <Link key={it.href} href={it.href}
               className={cn(

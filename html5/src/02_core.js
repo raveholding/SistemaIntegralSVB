@@ -104,6 +104,23 @@ const DEFAULT_ROLE_PERMS = {
   client_admin: [], client_user: [],
 };
 
+/* ───────────── Licencia por paquete (candado por módulo) ─────────────
+   La define SOLO el desarrollador al entregar el sistema (no hay UI para cambiarla).
+   Espejo de supabase/migrations/*_licenses.sql. Aquí es candado de interfaz: en la
+   versión con base de datos, el candado real lo aplica Postgres (tenants_with / RLS). */
+const LICENSE = { package: "completo_app", ai: true, status: "active" }; // status: active | follow_up (mantenimiento en seguimiento: NO bloquea)
+const LICENSE_PACKAGES = {
+  menu:         { name: "Menú",           price: 100000,  modules: ["cms"] },
+  crm_pos:      { name: "Menú + CRM/POS", price: 400000,  modules: ["cms", "crm", "pos"] },
+  completo:     { name: "Completo",       price: 700000,  modules: ["cms", "crm", "pos", "docs", "hr", "monitor"] },
+  completo_app: { name: "Completo + App", price: 1200000, modules: ["cms", "crm", "pos", "docs", "hr", "monitor", "portal"] },
+};
+const MODULE_LABELS = { cms: "Web y menú", crm: "CRM y planes", pos: "Caja y POS", docs: "Contratos", hr: "Equipo y comisiones", monitor: "Infraestructura", portal: "App del cliente y soporte", ai: "Asistente con IA (Pro + IA)" };
+const PERM_MODULES = { cms: "cms", crm: "crm", pos: "pos", docs: "docs", hr: "hr", commissions: "hr", monitor: "monitor", tickets: "portal" };
+const permModule = (p) => PERM_MODULES[String(p).split(".")[0]] ?? null;   // null = siempre disponible (audit, settings, billing, inbox)
+const licenseModules = () => { const pk = LICENSE_PACKAGES[LICENSE.package]; return pk ? pk.modules.concat(LICENSE.ai ? ["ai"] : []) : []; };
+const moduleOn = (m) => m === null || m === undefined || licenseModules().includes(m);
+
 /* ───────────── Estado + persistencia ───────────── */
 let S = null;
 let saveTimer = null;
@@ -177,7 +194,9 @@ function permsOf(u) {
   for (const [p, g] of Object.entries(u.overrides ?? {})) g ? base.add(p) : base.delete(p);
   return [...base];
 }
-const can = (p) => permsOf(currentUser()).includes(p);
+const can = (p) => moduleOn(permModule(p)) && permsOf(currentUser()).includes(p);
+/* Rol lo permitiría pero la licencia no incluye el módulo → se muestra con candado */
+const lockedByLicense = (p) => !moduleOn(permModule(p)) && permsOf(currentUser()).includes(p);
 const isPortalUser = (u = currentUser()) => u && (u.role === "client_admin" || u.role === "client_user");
 function need(p) { if (!can(p)) throw new Error(`Permiso denegado: ${p}`); }
 

@@ -3,12 +3,14 @@ import { Sidebar, type NavItem } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { DemoBanner } from "@/components/ui/misc";
 import { getContext } from "@/lib/session";
+import { hasModule, permModule } from "@/lib/license";
+import { ROLE_PERMISSIONS, type Permission } from "@/lib/rbac";
 import { getKpis } from "@/lib/data/dashboard";
 
 export const dynamic = "force-dynamic";
 
 const NAV: NavItem[] = [
-  { href: "/",          label: "Resumen",          icon: "dashboard", perm: "crm.read" },
+  { href: "/",          label: "Resumen",          icon: "dashboard", perm: "cms.read" },
   { href: "/monitor",   label: "Infraestructura",  icon: "monitor",   perm: "monitor.read" },
   { href: "/documentos",label: "Contratos",        icon: "docs",      perm: "docs.read" },
   { href: "/crm",       label: "CRM y planes",     icon: "crm",       perm: "crm.read" },
@@ -24,8 +26,13 @@ export default async function StaffLayout({ children }: { children: React.ReactN
   if (ctx.portal) redirect("/portal");               // aislamiento: clientes nunca ven el backoffice
 
   const kpis = await getKpis(ctx.tenantId).catch(() => null);
-  const items = NAV.filter((n) => ctx.perms.includes(n.perm)).map((n) => ({
+  // Visible si tiene el permiso; con candado si su rol lo tendría pero la licencia no incluye el módulo.
+  const items = NAV.filter((n) =>
+    ctx.perms.includes(n.perm) ||
+    (!hasModule(ctx.license, permModule(n.perm)) && ROLE_PERMISSIONS[ctx.role].includes(n.perm as Permission))
+  ).map((n) => ({
     ...n,
+    locked: !hasModule(ctx.license, permModule(n.perm)),
     badge: n.icon === "monitor" ? kpis?.open_alerts : n.icon === "tickets" ? kpis?.open_tickets : undefined,
   }));
 

@@ -48,6 +48,7 @@ table{width:100%;border-collapse:collapse}
 .tk .gracias{margin-top:6px;font-weight:700}
 /* tarjetas 85 × 55 mm */
 .hoja-t{display:flex;flex-wrap:wrap;gap:6mm;justify-content:center;padding:10mm}
+@media print{.tj{break-inside:avoid;page-break-inside:avoid}}
 .tj{width:85mm;height:55mm;border-radius:3mm;overflow:hidden;position:relative;box-shadow:0 0 0 .2mm #ccc}
 .tj.frente{background:#0b0b0c;color:#fff;padding:6mm;display:flex;flex-direction:column}
 .tj.frente .marca svg{width:11mm;height:11mm}.tj.frente .marca b{font-size:12px}.tj.frente .marca span{color:#a0a8b5;font-size:8px}
@@ -153,19 +154,57 @@ function printContrato(id) {
   audit("PRINT", "clients", id, null, { label: "Contrato de servicio" }); save();
 }
 
-/* ───── 4. Tarjetas de los dueños ───── */
-function printTarjetasDuenos() {
-  const duenos = S.users.filter((u) => u.active !== false && (u.role === "owner" || u.role === "partner"));
-  const tarjeta = (u) => `<div class="tj frente"><div class="marca">${VB_LOGO("#0b0b0c")}<div><b>Vincular Business</b><span>Sistemas de gestión</span></div></div>
-      <div class="nom">${esc(u.name)}</div><div class="rol">${u.role === "owner" ? "Dueño" : "Socio"}</div>
-      <div class="dat">WhatsApp ${esc(u.phone || DEV.wa)}<br>${esc(u.email || DEV.email)}<br>${VB_WEB}</div></div>
-    <div class="tj dorso"><div>${VB_LOGO("#0b0b0c")}<b>Vincular Business</b><span>Tu negocio en orden, con todo en un solo sistema.</span></div></div>`;
-  vbAbrir("Tarjetas de los dueños", `<div class="hoja-t">${duenos.map(tarjeta).join("")}</div>`);
+/* ───── 4. Tarjetas del personal (dueños y empleados), editables ───── */
+const TJ_KEY = "vb_tarjetas_v1";
+function tjInicial() {
+  try { const g = JSON.parse(localStorage.getItem(TJ_KEY) || "null"); if (Array.isArray(g) && g.length) return g; } catch { }
+  const filas = [];
+  S.users.filter((u) => u.active !== false && !u.clientId).forEach((u) => filas.push({ nombre: u.name, cargo: u.role === "owner" ? "Dueño" : u.role === "partner" ? "Socio" : (ROLES[u.role] || "Equipo"), tel: u.phone || DEV.wa, email: u.email || DEV.email }));
+  S.employees.filter((e) => e.active && !filas.some((x) => x.nombre === e.name)).forEach((e) => filas.push({ nombre: e.name, cargo: e.position || "Equipo", tel: DEV.wa, email: DEV.email }));
+  if (!filas.length) filas.push({ nombre: "Nombre y apellido", cargo: "Cargo", tel: DEV.wa, email: DEV.email });
+  return filas;
 }
+let TJ = null;
+function tjLeer() {
+  document.querySelectorAll("#tj-tabla tbody tr").forEach((tr, i) => {
+    const v = (k) => (tr.querySelector(`[data-k=${k}]`)?.value || "").trim();
+    TJ[i] = { nombre: v("nombre"), cargo: v("cargo"), tel: v("tel"), email: v("email") };
+  });
+  try { localStorage.setItem(TJ_KEY, JSON.stringify(TJ)); } catch { }
+}
+function tjFilas() {
+  return TJ.map((p, i) => `<tr>
+    <td><input class="in" data-k="nombre" maxlength="40" value="${esc(p.nombre)}" placeholder="Nombre y apellido"></td>
+    <td><input class="in" data-k="cargo" maxlength="30" value="${esc(p.cargo)}" placeholder="Cargo"></td>
+    <td><input class="in" data-k="tel" maxlength="30" value="${esc(p.tel)}" placeholder="WhatsApp"></td>
+    <td><input class="in" data-k="email" maxlength="60" value="${esc(p.email)}" placeholder="Email"></td>
+    <td>${btn("Quitar", "tj-del", { sm: true, tone: "ghost", data: { i } })}</td></tr>`).join("");
+}
+function tjEditor() {
+  TJ = tjInicial();
+  openModal("Tarjetas del personal", `<p class="small muted" style="margin:0 0 12px">Escribí los datos de cada persona (dueños y empleados). Los cambios se guardan en este equipo. Al tocar <b>Descargar PDF</b> se abre la hoja lista: elegí «Guardar como PDF» o imprimila. Cada tarjeta mide 85 × 55 mm, con frente y dorso.</p>
+    <div class="tw"><table id="tj-tabla"><thead><tr><th>Nombre</th><th>Cargo</th><th>WhatsApp</th><th>Email</th><th></th></tr></thead><tbody>${tjFilas()}</tbody></table></div>
+    <div class="row" style="margin-top:12px">${btn("Agregar persona", "tj-add", { sm: true })}${btn("Restablecer desde usuarios", "tj-reset", { sm: true, tone: "ghost" })}</div>`,
+    { wide: true, footer: `<div class="modal-f">${btn("Descargar PDF", "tj-pdf", { tone: "primary" })}</div>` });
+}
+function tjRedibujar() { const tb = document.querySelector("#tj-tabla tbody"); if (tb) tb.innerHTML = tjFilas(); }
+function printTarjetas(lista) {
+  const personas = (lista || []).filter((p) => p.nombre);
+  const tarjeta = (p) => `<div class="tj frente"><div class="marca">${VB_LOGO("#0b0b0c")}<div><b>Vincular Business</b><span>Sistemas de gestión</span></div></div>
+      <div class="nom">${esc(p.nombre)}</div><div class="rol">${esc(p.cargo || "")}</div>
+      <div class="dat">${p.tel ? "WhatsApp " + esc(p.tel) + "<br>" : ""}${p.email ? esc(p.email) + "<br>" : ""}${VB_WEB}</div></div>
+    <div class="tj dorso"><div>${VB_LOGO("#0b0b0c")}<b>Vincular Business</b><span>Tu negocio en orden, con todo en un solo sistema.</span></div></div>`;
+  vbAbrir("Tarjetas del personal · Vincular Business", `<div class="hoja-t">${personas.map(tarjeta).join("")}</div>`);
+}
+function printTarjetasDuenos() { tjEditor(); }
 
 Object.assign(A, {
   "client-ficha": (el) => printClientFicha(el.dataset.id),
   "client-contrato": (el) => printContrato(el.dataset.id),
-  "owner-cards": () => printTarjetasDuenos(),
+  "owner-cards": () => tjEditor(),
+  "tj-add": () => { tjLeer(); TJ.push({ nombre: "", cargo: "", tel: DEV.wa, email: "" }); tjRedibujar(); },
+  "tj-del": (el) => { tjLeer(); TJ.splice(Number(el.dataset.i), 1); if (!TJ.length) TJ.push({ nombre: "", cargo: "", tel: DEV.wa, email: "" }); tjRedibujar(); },
+  "tj-reset": () => { try { localStorage.removeItem(TJ_KEY); } catch { } TJ = tjInicial(); tjRedibujar(); },
+  "tj-pdf": () => { tjLeer(); printTarjetas(TJ); },
 });
 </script>

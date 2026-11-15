@@ -2,7 +2,7 @@
    - La app (index.html) se pide primero a la red y, sin señal, sale de la caché.
    - El SDK de Firebase (versión fija en la URL) se guarda en caché para abrir sin conexión.
    - Las llamadas a Firestore/Auth NO pasan por acá: las maneja el SDK (con su propia caché offline). */
-const VERSION = "svb-v2.2.0";
+const VERSION = "svb-v2.3.0";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"];
 
 self.addEventListener("install", (e) => {

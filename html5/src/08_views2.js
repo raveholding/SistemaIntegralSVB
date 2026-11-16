@@ -327,6 +327,7 @@ function viewPortal() {
         ${up ? `<div class="card" style="padding:16px;margin-top:14px;background:rgba(255,122,26,.06);box-shadow:inset 0 0 0 1px rgba(255,122,26,.25)"><b>Sumá automatizaciones e IA</b><p class="xs muted" style="margin:6px 0 12px">${up.features.slice(1).map(esc).join(" · ")} — ${fmt.money(up.price)}/mes</p>
           ${pendingUp ? pill("info", "Solicitud enviada · tu ejecutivo te contactará", true) : u.role === "client_admin" ? btn(`Quiero pasar a ${esc(up.name)}`, "portal-upgrade", { tone: "primary", ic: "spark", data: { id: up.id } }).replace('class="btn', 'class="btn block') : '<p class="xs subtle">Pedile al administrador de tu empresa que lo solicite.</p>'}</div>` : ""}</div>`)}
     </div>
+    ${portalRecomienda(c)}
     ${card("Mis facturas y recibos", table(["Comprobante", "Fecha", "CAE", ">Total", ""], invoices.map((d) => `<tr><td class="mono small t">${docLabel(d)} ${d.status === "voided" ? pill("crit", "Anulado") : ""}</td><td class="xs">${fmt.date(d.issuedAt)}</td><td class="xs mono">${d.cae ?? "—"}</td><td class="right num b">${fmt.money(d.total, true)}</td><td class="right">${btn("", "doc-print", { sm: true, tone: "ghost", ic: "print", data: { id: d.id } })}</td></tr>`), "Todavía no hay comprobantes"), { cls: "mb" })}
     <div class="grid g2">
       ${card("Mis tickets", `<ul class="list">${tickets.length ? tickets.map((t) => `<li class="row" style="cursor:pointer" data-act="tk-open" data-id="${t.id}"><span class="mono xs subtle">#${t.number}</span><span class="grow small" style="color:var(--fg)">${esc(t.subject)}</span><span class="xs subtle">${fmt.rel(t.at)}</span>${mapPill(TICKET_STATUS, t.status)}</li>`).join("") : '<li class="empty">No tenés tickets</li>'}</ul>`)}
@@ -334,6 +335,22 @@ function viewPortal() {
     </div>
     <p class="xs subtle center" style="margin-top:28px">¿Necesitás ayuda urgente? WhatsApp ${DEV.wa} · ${DEV.email}</p>
   </main>`;
+}
+
+/* Recomendá y ganá: código del cliente + compartir por WhatsApp */
+function portalRecomienda(c) {
+  const code = "VB-" + String(c.id).replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
+  const name = c.tradeName || c.legalName;
+  const share = encodeURIComponent(`Te recomiendo el Sistema Vincular Business: lo uso en ${name} para ventas, stock y facturación. El primer mes es gratis y con mi código ${code} tenés 10 % de descuento en tu primer pago. Escribiles: https://wa.me/${String(S.settings.channels?.whatsapp || "5493874484132").replace(/\D/g, "")}`);
+  const aviso = encodeURIComponent(`Hola Vincular Business, les recomendé un negocio. Mi código es ${code}. El negocio es: `);
+  return `<div class="card mb" style="padding:20px 24px;background:rgba(255,122,26,.06);box-shadow:inset 0 0 0 1px rgba(255,122,26,.25)">
+    <div class="row between" style="flex-wrap:wrap;gap:14px"><div><b style="font-size:17px">Recomendá y ganá</b>
+      <p class="small muted" style="margin:6px 0 0">Por cada negocio que recomiendes y active su plan, te bonificamos <b>1 mes</b>. El negocio recomendado tiene <b>10 % de descuento</b> en su primer pago.</p></div>
+      <div class="center"><div class="xs subtle">Tu código</div><div class="mono b" style="font-size:22px;letter-spacing:.06em">${code}</div></div></div>
+    <div class="row" style="margin-top:14px;gap:10px;flex-wrap:wrap">
+      <a class="btn primary" href="https://wa.me/?text=${share}" target="_blank" rel="noopener noreferrer">${icon("send")}Compartir por WhatsApp</a>
+      <a class="btn ghost" href="https://wa.me/${String(S.settings.channels?.whatsapp || "5493874484132").replace(/\D/g, "")}?text=${aviso}" target="_blank" rel="noopener noreferrer">Ya recomendé a alguien</a>
+    </div></div>`;
 }
 
 /* ───────── BÚSQUEDA Y NOTIFICACIONES ───────── */

@@ -3217,11 +3217,11 @@ function portalRecomienda(c) {
   var _a, _b;
   const code = "VB-" + String(c.id).replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
   const name = c.tradeName || c.legalName;
-  const share = encodeURIComponent(`Te recomiendo el Sistema Vincular Business: lo uso en ${name} para ventas, stock y facturación. El primer mes es gratis y con mi código ${code} tenés 10 % de descuento en tu primer pago. Escribiles: https://wa.me/${String(((_a = S.settings.channels) == null ? void 0 : _a.whatsapp) || "5493874484132").replace(/\D/g, "")}`);
+  const share = encodeURIComponent(`Te recomiendo el Sistema Vincular Business: lo uso en ${name} para ventas, stock y facturación. El primer mes es gratis. Decí que venís de mi parte con el código ${code}. Escribiles: https://wa.me/${String(((_a = S.settings.channels) == null ? void 0 : _a.whatsapp) || "5493874484132").replace(/\D/g, "")}`);
   const aviso = encodeURIComponent(`Hola Vincular Business, les recomendé un negocio. Mi código es ${code}. El negocio es: `);
   return `<div class="card mb" style="padding:20px 24px;background:rgba(255,122,26,.06);box-shadow:inset 0 0 0 1px rgba(255,122,26,.25)">
     <div class="row between" style="flex-wrap:wrap;gap:14px"><div><b style="font-size:17px">Recomendá y ganá</b>
-      <p class="small muted" style="margin:6px 0 0">Por cada negocio que recomiendes y active su plan, te bonificamos <b>1 mes</b>. El negocio recomendado tiene <b>10 % de descuento</b> en su primer pago.</p></div>
+      <p class="small muted" style="margin:6px 0 0">Cada <b>3 negocios</b> que nos recomiendes y activen su plan, tenés <b>10 % de descuento</b> en tu próximo pago. Pasales tu código para que sepamos que vienen de tu parte.</p></div>
       <div class="center"><div class="xs subtle">Tu código</div><div class="mono b" style="font-size:22px;letter-spacing:.06em">${code}</div></div></div>
     <div class="row" style="margin-top:14px;gap:10px;flex-wrap:wrap">
       <a class="btn primary" href="https://wa.me/?text=${share}" target="_blank" rel="noopener noreferrer">${icon("send")}Compartir por WhatsApp</a>
